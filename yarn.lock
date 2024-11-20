@@ -6331,6 +6331,11 @@ react-devtools-core@^4.27.2:
     shell-quote "^1.6.1"
     ws "^7"
 
+react-freeze@^1.0.0:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/react-freeze/-/react-freeze-1.0.4.tgz#cbbea2762b0368b05cbe407ddc9d518c57c6f3ad"
+  integrity sha512-r4F0Sec0BLxWicc7HEyo2x3/2icUTrRmDjaaRyzzn+7aDyFZliszMDOgLVwSnQnYENOlL1o569Ze2HZefk8clA==
+
 "react-is@^16.12.0 || ^17.0.0 || ^18.0.0", react-is@^18.0.0, react-is@^18.3.1:
   version "18.3.1"
   resolved "https://registry.npmjs.org/react-is/-/react-is-18.3.1.tgz"
@@ -6377,6 +6382,21 @@ react-native-safe-area-context@^4.14.0:
   version "4.14.0"
   resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-4.14.0.tgz#138f4b2e180cb7517c78bd5f4d4cf91325ba0b1a"
   integrity sha512-/SyYpCulWQOnnXhRq6wepkhoyQMowHm1ptDyRz20s+YS/R9mbd+mK+jFyFCyXFJn8jp7vFl43VUCgspuOiEbwA==
+
+react-native-screens@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-4.2.0.tgz#4d79ecd1be49506cdb1477b9582c6531d64e0225"
+  integrity sha512-FqQSWjDNsLuoLHx28PQBKJKQFn6kVB3+hmuEQl6NtBZXYVn3c3I/UVc7kyWv7vndJTBqS4a7Xshz4CJqjnZNFg==
+  dependencies:
+    react-freeze "^1.0.0"
+    warn-once "^0.1.0"
+
+react-native-tab-view@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/react-native-tab-view/-/react-native-tab-view-4.0.2.tgz#7debb5651dc9f12e215304aedcdbba59d7a01d4a"
+  integrity sha512-u70Et9onvAGhcBRda8NO+JgM/10G3kg/jWsbDY7QQSOAri7F7+VVS/4uupxjbCDSkL1BJdUOqhUToK/M2AH34Q==
+  dependencies:
+    use-latest-callback "^0.2.1"
 
 react-native@0.72.3:
   version "0.72.3"

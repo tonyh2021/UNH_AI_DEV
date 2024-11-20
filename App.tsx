@@ -9,11 +9,14 @@ import React from 'react';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import createScaledStyle from '@/utils/createScaledStyle';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {MainNavigator} from '@/navigation/MainNavigator';
 
 function App(): React.JSX.Element {
   return (
     <GestureHandlerRootView style={styles.gestureWrap}>
-      <SafeAreaProvider>{/* <MainNavigator /> */}</SafeAreaProvider>
+      <SafeAreaProvider>
+        <MainNavigator />
+      </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }
