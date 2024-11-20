@@ -1,7 +1,13 @@
 import React from 'react';
 import type {PropsWithChildren} from 'react';
-import {ScrollView, StyleSheet, Text, useColorScheme, View} from 'react-native';
-
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useColorScheme,
+  View,
+} from 'react-native';
 import {
   Colors,
   DebugInstructions,
@@ -9,6 +15,8 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {RootStackParams} from '@/navigation/types/RootStackParams';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -41,6 +49,8 @@ function Section({children, title}: SectionProps): React.JSX.Element {
 }
 
 const DemoView = () => {
+  const navigation = useNavigation<NavigationProp<RootStackParams>>();
+
   return (
     <ScrollView contentInsetAdjustmentBehavior="automatic">
       <Header />
@@ -48,6 +58,14 @@ const DemoView = () => {
         style={{
           backgroundColor: Colors.white,
         }}>
+        <TouchableOpacity
+          onPress={() => {
+            console.log('press');
+            navigation.navigate('EmptyScreen');
+            // navigation.navigate('DemoView', {userId: '1234'});
+          }}>
+          <Text>press</Text>
+        </TouchableOpacity>
         <Section title="Step One">
           Edit <Text style={styles.highlight}>App.tsx</Text> to change this
           screen and then come back to see your edits.

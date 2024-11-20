@@ -6,13 +6,13 @@ import DemoView from '@/views/demo/DemoView';
 
 const Tab = createBottomTabNavigator();
 
-const Home = () => {
+const HomeTab = () => {
   return (
     <Tab.Navigator>
-      <Tab.Screen name="Profile" component={DemoView} />
-      <Tab.Screen name="Settings" component={EmptyScreen} />
+      <Tab.Screen name="Demo" component={DemoView} />
+      <Tab.Screen name="Empty" component={EmptyScreen} />
     </Tab.Navigator>
   );
 };
 
-export default Home;
+export default HomeTab;

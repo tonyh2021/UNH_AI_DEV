@@ -1,10 +1,12 @@
 import React from 'react';
 import {DefaultTheme, NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import Home from '@/views/home';
+import HomeTab from '@/views/home/HomeTab';
 import EmptyScreen from '@/views/demo/EmptyScreen';
+import {RootStackParams} from '@/navigation/types/RootStackParams';
+import DemoView from '@/views/demo/DemoView';
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParams>();
 
 export const MainNavigator = () => {
   const MyTheme = {
@@ -26,11 +28,12 @@ export const MainNavigator = () => {
       theme={MyTheme}>
       <Stack.Navigator>
         <Stack.Screen
-          name="Home"
-          component={Home}
+          name="HomeTab"
+          component={HomeTab}
           options={{headerShown: false}}
         />
-        <Stack.Screen name="EditPost" component={EmptyScreen} />
+        <Stack.Screen name="EmptyScreen" component={EmptyScreen} />
+        <Stack.Screen name="DemoView" component={DemoView} />
       </Stack.Navigator>
     </NavigationContainer>
   );
