@@ -2,9 +2,9 @@ import React from 'react';
 import type {PropsWithChildren} from 'react';
 import {
   ScrollView,
+  StatusBar,
   StyleSheet,
   Text,
-  TouchableOpacity,
   useColorScheme,
   View,
 } from 'react-native';
@@ -48,40 +48,34 @@ function Section({children, title}: SectionProps): React.JSX.Element {
   );
 }
 
-const DemoView = () => {
+const RNIntro = () => {
   const navigation = useNavigation<NavigationProp<RootStackParams>>();
 
   return (
-    <ScrollView contentInsetAdjustmentBehavior="automatic">
-      <Header />
-      <View
-        style={{
-          backgroundColor: Colors.white,
-        }}>
-        <TouchableOpacity
-          onPress={() => {
-            console.log('press');
-            navigation.navigate('EmptyScreen');
-            // navigation.navigate('DemoView', {userId: '1234'});
+    <>
+      <ScrollView contentInsetAdjustmentBehavior="never">
+        <Header />
+        <View
+          style={{
+            backgroundColor: Colors.white,
           }}>
-          <Text>press</Text>
-        </TouchableOpacity>
-        <Section title="Step One">
-          Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-          screen and then come back to see your edits.
-        </Section>
-        <Section title="See Your Changes">
-          <ReloadInstructions />
-        </Section>
-        <Section title="Debug">
-          <DebugInstructions />
-        </Section>
-        <Section title="Learn More">
-          Read the docs to discover what to do next:
-        </Section>
-        <LearnMoreLinks />
-      </View>
-    </ScrollView>
+          <Section title="Step One">
+            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
+            screen and then come back to see your edits.
+          </Section>
+          <Section title="See Your Changes">
+            <ReloadInstructions />
+          </Section>
+          <Section title="Debug">
+            <DebugInstructions />
+          </Section>
+          <Section title="Learn More">
+            Read the docs to discover what to do next:
+          </Section>
+          <LearnMoreLinks />
+        </View>
+      </ScrollView>
+    </>
   );
 };
 
@@ -104,4 +98,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DemoView;
+export default RNIntro;

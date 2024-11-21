@@ -1,8 +1,8 @@
 import * as React from 'react';
 import {View} from 'react-native';
 
-const EmptyScreen = () => {
+const OpenAIList = () => {
   return <View />;
 };
 
-export default EmptyScreen;
+export default OpenAIList;

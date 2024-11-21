@@ -1,10 +1,10 @@
 import React from 'react';
 import {DefaultTheme, NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import HomeTab from '@/views/home/HomeTab';
-import EmptyScreen from '@/views/demo/EmptyScreen';
 import {RootStackParams} from '@/navigation/types/RootStackParams';
-import DemoView from '@/views/demo/DemoView';
+import HomeTab from '@/views/home/HomeTab';
+import EmptyPage from '@/views/demo/EmptyPage';
+import RNIntro from '@/views/demo/RNIntro';
 
 const Stack = createNativeStackNavigator<RootStackParams>();
 
@@ -32,8 +32,8 @@ export const MainNavigator = () => {
           component={HomeTab}
           options={{headerShown: false}}
         />
-        <Stack.Screen name="EmptyScreen" component={EmptyScreen} />
-        <Stack.Screen name="DemoView" component={DemoView} />
+        <Stack.Screen name="EmptyPage" component={EmptyPage} />
+        <Stack.Screen name="RNIntro" component={RNIntro} />
       </Stack.Navigator>
     </NavigationContainer>
   );
