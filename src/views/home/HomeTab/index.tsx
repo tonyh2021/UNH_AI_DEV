@@ -2,7 +2,7 @@ import * as React from 'react';
 import {View, Text} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import RNIntro from '@/views/demo/RNIntro';
-import OpenAIList from '@/views/openai/OpenAIList';
+import OpenAI from '@/views/openai/OpenAI';
 import appStyles from '@/utils/styleHelper';
 import Icon from 'react-native-remix-icon';
 
@@ -30,8 +30,6 @@ const HomeTab = () => {
       tabName: 'React Native',
     },
   ] as TabScreen[];
-
-  const getTabIcon = (iconName: string, focused: boolean) => {};
 
   const getTabLabel = (tabName: string, focused: boolean) => {
     const fontWeight = focused
@@ -69,7 +67,7 @@ const HomeTab = () => {
           backgroundColor: appStyles.color.background,
         },
       })}>
-      <Tab.Screen name="OpenAI" component={OpenAIList} />
+      <Tab.Screen name="OpenAI" component={OpenAI} />
       <Tab.Screen
         name="React Native"
         options={{headerShown: true}}
