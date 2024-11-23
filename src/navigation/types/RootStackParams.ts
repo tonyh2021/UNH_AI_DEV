@@ -1,6 +1,9 @@
+import {Robot} from '@/utils/RobotData';
+
 export type RootStackParams = {
   Home: undefined;
-  OpenAI: {id: string};
+  OpenAI: {robot: Robot};
+  Gemini: {robot: Robot};
   HomeTab: undefined;
   EmptyPage: undefined;
   RNIntro: undefined;

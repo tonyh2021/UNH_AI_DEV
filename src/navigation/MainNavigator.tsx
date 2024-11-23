@@ -8,6 +8,7 @@ import RNIntro from '@/views/demo/RNIntro';
 import Home from '@/views/home/Home';
 import MessageDemo from '@/views/demo/MessageDemo';
 import OpenAI from '@/views/openai/OpenAI';
+import Gemini from '@/views/gemini/Gemini';
 
 const Stack = createNativeStackNavigator<RootStackParams>();
 
@@ -41,6 +42,7 @@ export const MainNavigator = () => {
           options={{headerShown: false}}
         />
         <Stack.Screen name="OpenAI" component={OpenAI} />
+        <Stack.Screen name="Gemini" component={Gemini} />
         <Stack.Screen name="EmptyPage" component={EmptyPage} />
         <Stack.Screen name="RNIntro" component={RNIntro} />
         <Stack.Screen name="MessageDemo" component={MessageDemo} />

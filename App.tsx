@@ -5,13 +5,18 @@
  * @format
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import createScaledStyle from '@/utils/createScaledStyle';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {MainNavigator} from '@/navigation/MainNavigator';
+import {initHttpConfig} from '@/http/request';
 
-function App(): React.JSX.Element {
+const App = () => {
+  useEffect(() => {
+    initHttpConfig();
+  }, []);
+
   return (
     <GestureHandlerRootView style={styles.gestureWrap}>
       <SafeAreaProvider>
@@ -19,7 +24,7 @@ function App(): React.JSX.Element {
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
-}
+};
 
 export default App;
 

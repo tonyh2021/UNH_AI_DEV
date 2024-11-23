@@ -1,0 +1,2 @@
+export const GEMINI_API_KEY = 'AIzaSyBcg0hLtIPRRc_0LckSUI1eK31V-J5YDxA';
+export const OPENAI_API_KEY = 'AIzaSyBcg0hLtIPRRc_0LckSUI1eK31V-J5YDxA';

@@ -24,7 +24,7 @@ const Home = () => {
         key={item.id}
         onPress={() => setSelectedRobot(item)}>
         <Image
-          source={item.image}
+          source={{uri: item.image}}
           style={[styles.avatarImage, {borderColor: item.primary}]}
         />
       </TouchableOpacity>
@@ -38,7 +38,7 @@ const Home = () => {
           <Text style={[styles.greeting, {color: selectedRobot.primary}]}>
             Hello, I am {selectedRobot.name}
           </Text>
-          <Image source={selectedRobot.image} style={styles.mainImage} />
+          <Image source={{uri: selectedRobot.image}} style={styles.mainImage} />
           <Text style={[styles.subtitle, {color: selectedRobot.primary}]}>
             How can I help you?
           </Text>
@@ -57,11 +57,13 @@ const Home = () => {
         <Text style={styles.hint}>{'Choose your AI companion'}</Text>
 
         <TouchableOpacity
-          onPress={() =>
-            navigation.navigate(selectedRobot.target as any, {
-              id: selectedRobot.id,
-            })
-          }
+          onPress={() => {
+            if (selectedRobot.id === '0') {
+              navigation.navigate('OpenAI', {robot: selectedRobot});
+            } else {
+              navigation.navigate('Gemini', {robot: selectedRobot});
+            }
+          }}
           style={[styles.chatButton, {backgroundColor: selectedRobot.primary}]}>
           <Text style={styles.buttonText}>Let's chat</Text>
         </TouchableOpacity>
