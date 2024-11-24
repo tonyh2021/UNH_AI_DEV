@@ -5,7 +5,6 @@ import {
   Image,
   FlatList,
   TouchableOpacity,
-  Dimensions,
 } from 'react-native';
 import React, {useState} from 'react';
 import {Robot, RobotData} from '@/utils/RobotData';

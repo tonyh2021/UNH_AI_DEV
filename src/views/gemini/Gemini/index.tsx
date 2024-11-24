@@ -1,24 +1,25 @@
-import React, {useState, useCallback, useEffect} from 'react';
-import {
-  StyleSheet,
-  SafeAreaView,
-  TouchableOpacity,
-  View,
-  Text,
-  Image,
-} from 'react-native';
+import React, {useState, useCallback, useEffect, useLayoutEffect} from 'react';
+import {StyleSheet, SafeAreaView, View, Image} from 'react-native';
 import {
   GiftedChat,
   Bubble,
   Send,
   InputToolbar,
-  Message,
   IMessage,
 } from 'react-native-gifted-chat';
-import {useRoute, useNavigation} from '@react-navigation/native';
+import {
+  useRoute,
+  useNavigation,
+  NavigationProp,
+} from '@react-navigation/native';
 import {Robot} from '@/utils/RobotData';
 import Icon from 'react-native-remix-icon';
 import {requestGemini} from '@/http/GeminiAPI';
+import appStyles from '@/utils/styleHelper';
+import Header from '@/navigation/Header';
+import {HeaderBackButtonProps} from '@react-navigation/elements';
+import BackButton from '@/navigation/BackButton';
+import {RootStackParams} from '@/navigation/types/RootStackParams';
 
 interface Props {
   robot: Robot;
@@ -28,7 +29,8 @@ const Gemini = () => {
   const param = useRoute().params as Props;
   const robot = param.robot;
 
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<RootStackParams>>();
+
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -37,6 +39,20 @@ const Gemini = () => {
     name: robot.name,
     avatar: robot.image,
   };
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: (props: HeaderBackButtonProps) => (
+        <BackButton {...props} tintColor={robot.primary} />
+      ),
+      headerTitle: () =>
+        Header({
+          avatar: robot.image,
+          name: robot.name,
+          color: robot.primary,
+        }),
+    });
+  }, [navigation]);
 
   useEffect(() => {
     const message = {
@@ -47,22 +63,6 @@ const Gemini = () => {
     };
     setMessages([message]);
   }, []);
-
-  const renderHeader = () => (
-    <View style={styles.header}>
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}>
-        {/* <Ionicons name="arrow-back" size={24} color="#000" /> */}
-      </TouchableOpacity>
-
-      <View style={styles.headerContent}>
-        <Image source={{uri: robot.image}} style={styles.headerAvatar} />
-        <Text style={styles.headerTitle}>{robot.name}</Text>
-      </View>
-      <View style={styles.placeholder} />
-    </View>
-  );
 
   const renderAvatar = () => {
     return <Image style={styles.avatar} source={{uri: robot.image}} />;
@@ -161,7 +161,6 @@ const Gemini = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {renderHeader()}
       <GiftedChat
         messages={messages}
         isTyping={loading}
@@ -189,39 +188,7 @@ export default Gemini;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
-    paddingTop: 50,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-    backgroundColor: '#fff',
-  },
-  headerContent: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginLeft: 15,
-  },
-  headerAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 10,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#000',
-  },
-  backButton: {
-    padding: 10,
-  },
-  placeholder: {
-    width: 44, // Same width as backButton for symmetry
+    backgroundColor: appStyles.color.background,
   },
   avatar: {
     width: 40,

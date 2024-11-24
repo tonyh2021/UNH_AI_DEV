@@ -9,6 +9,7 @@ import Home from '@/views/home/Home';
 import MessageDemo from '@/views/demo/MessageDemo';
 import OpenAI from '@/views/openai/OpenAI';
 import Gemini from '@/views/gemini/Gemini';
+import appStyles from '@/utils/styleHelper';
 
 const Stack = createNativeStackNavigator<RootStackParams>();
 
@@ -17,7 +18,7 @@ export const MainNavigator = () => {
     ...DefaultTheme,
     colors: {
       ...DefaultTheme.colors,
-      background: 'white', // 设置背景颜色
+      background: appStyles.color.background,
     },
   };
 
