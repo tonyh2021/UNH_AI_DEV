@@ -1,4 +1,4 @@
-import {GEMINI_API_KEY} from '@/config/ApiConfig';
+import {GEMINI_API_KEY} from '@env';
 import axios from 'axios';
 
 const BASE_URL =
