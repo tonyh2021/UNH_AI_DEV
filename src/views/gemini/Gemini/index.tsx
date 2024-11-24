@@ -3,7 +3,6 @@ import {StyleSheet, SafeAreaView, View, Image} from 'react-native';
 import {
   GiftedChat,
   Bubble,
-  Send,
   InputToolbar,
   IMessage,
 } from 'react-native-gifted-chat';
@@ -84,7 +83,7 @@ const Gemini = () => {
     if (message.user._id !== robot.id) {
       return null;
     }
-    return <TTSButton color={robot.primary}></TTSButton>;
+    return <TTSButton color={robot.primary} text={message.text}></TTSButton>;
   };
 
   const onSend = useCallback((newMessages: IMessage[]) => {
