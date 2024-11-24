@@ -13,7 +13,6 @@ import {
   NavigationProp,
 } from '@react-navigation/native';
 import {Robot} from '@/utils/RobotData';
-import Icon from 'react-native-remix-icon';
 import {requestGemini} from '@/http/GeminiAPI';
 import appStyles from '@/utils/styleHelper';
 import Header from '@/navigation/Header';
@@ -21,6 +20,8 @@ import {HeaderBackButtonProps} from '@react-navigation/elements';
 import BackButton from '@/navigation/BackButton';
 import {RootStackParams} from '@/navigation/types/RootStackParams';
 import {AIMessageType} from '@/http/type';
+import TTSButton from '@/views/common/TTSButton';
+import SendButton from '@/views/common/SendButton';
 
 interface Props {
   robot: Robot;
@@ -79,6 +80,13 @@ const Gemini = () => {
     return <Image style={styles.avatar} source={{uri: robot.image}} />;
   };
 
+  const renderTTSButton = (message: IMessage) => {
+    if (message.user._id !== robot.id) {
+      return null;
+    }
+    return <TTSButton color={robot.primary}></TTSButton>;
+  };
+
   const onSend = useCallback((newMessages: IMessage[]) => {
     updateMessages(newMessages);
     setLoading(true);
@@ -125,6 +133,7 @@ const Gemini = () => {
     return (
       <Bubble
         {...props}
+        renderTicks={renderTTSButton}
         wrapperStyle={{
           right: {
             backgroundColor: robot.primary,
@@ -146,13 +155,7 @@ const Gemini = () => {
   };
 
   const renderSend = (props: any) => {
-    return (
-      <Send {...props}>
-        <View style={styles.sendButton}>
-          <Icon name="send-plane-fill" size="24" color={robot.primary}></Icon>
-        </View>
-      </Send>
-    );
+    return <SendButton {...props} color={robot.primary}></SendButton>;
   };
 
   const renderInputToolbar = (props: any) => {
@@ -208,9 +211,5 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 2,
     borderColor: appStyles.color.lightGrey,
-  },
-  sendButton: {
-    marginRight: 10,
-    marginBottom: 5,
   },
 });
