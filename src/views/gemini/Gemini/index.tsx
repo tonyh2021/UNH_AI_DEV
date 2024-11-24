@@ -20,6 +20,7 @@ import Header from '@/navigation/Header';
 import {HeaderBackButtonProps} from '@react-navigation/elements';
 import BackButton from '@/navigation/BackButton';
 import {RootStackParams} from '@/navigation/types/RootStackParams';
+import {AIMessageType} from '@/http/type';
 
 interface Props {
   robot: Robot;
@@ -32,6 +33,7 @@ const Gemini = () => {
   const navigation = useNavigation<NavigationProp<RootStackParams>>();
 
   const [messages, setMessages] = useState<IMessage[]>([]);
+  const messagesRef = React.useRef(messages);
   const [loading, setLoading] = useState(false);
 
   const robotUser = {
@@ -56,43 +58,55 @@ const Gemini = () => {
 
   useEffect(() => {
     const message = {
-      _id: 0,
+      _id: Date.now(),
       text: `Hello, I am ${robot.name}`,
       createdAt: new Date(),
       user: robotUser,
     };
     setMessages([message]);
+    messagesRef.current = [message];
   }, []);
+
+  const updateMessages = (messages: IMessage[]) => {
+    setMessages(previousMessages => {
+      const updatedMessages = GiftedChat.append(previousMessages, messages);
+      messagesRef.current = updatedMessages;
+      return updatedMessages;
+    });
+  };
 
   const renderAvatar = () => {
     return <Image style={styles.avatar} source={{uri: robot.image}} />;
   };
 
   const onSend = useCallback((newMessages: IMessage[]) => {
-    setMessages(previousMessages =>
-      GiftedChat.append(previousMessages, newMessages),
-    );
+    updateMessages(newMessages);
     setLoading(true);
     if (newMessages[0]?.text) {
-      fetchGeminiResponse(newMessages[0].text);
+      fetchAPIResponse(newMessages[0].text);
     }
   }, []);
 
-  const fetchGeminiResponse = async (text: string) => {
+  const fetchAPIResponse = async (text: string) => {
+    const aiMessages = [] as AIMessageType[];
+    for (const message of messagesRef.current) {
+      aiMessages.push({
+        text: message.text,
+        role: message.user._id === robot.id ? 'model' : 'user',
+      });
+    }
+
     try {
-      const response = await requestGemini(text);
-      const geminiData =
-        response.data?.contents[0]?.parts[0]?.text ||
-        'Sorry 🙏 No data found 😢';
-      const apiMessage = {
+      const response = await requestGemini({
+        messages: aiMessages.reverse(),
+      });
+      const responseMessage = {
         _id: Date.now(),
-        text: geminiData,
+        text: response.data.text || 'Sorry. No data was found 😢',
         createdAt: new Date(),
         user: robotUser,
       };
-      setMessages(previousMessages =>
-        GiftedChat.append(previousMessages, [apiMessage]),
-      );
+      updateMessages([responseMessage]);
     } catch (error) {
       console.error('Error fetching Gemini response:', error);
       const errorMessage = {
@@ -101,9 +115,7 @@ const Gemini = () => {
         createdAt: new Date(),
         user: robotUser,
       };
-      setMessages(previousMessages =>
-        GiftedChat.append(previousMessages, [errorMessage]),
-      );
+      updateMessages([errorMessage]);
     } finally {
       setLoading(false);
     }
@@ -165,7 +177,7 @@ const Gemini = () => {
         messages={messages}
         isTyping={loading}
         onSend={onSend}
-        user={{_id: 1}}
+        user={{_id: 11}}
         renderBubble={renderBubble}
         renderSend={renderSend}
         renderInputToolbar={renderInputToolbar}

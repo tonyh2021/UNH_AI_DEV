@@ -57,9 +57,9 @@ const Home = () => {
 
         <TouchableOpacity
           onPress={() => {
-            if (selectedRobot.id === '0') {
+            if (selectedRobot.id === '10') {
               navigation.navigate('OpenAI', {robot: selectedRobot});
-            } else {
+            } else if (selectedRobot.id === '20') {
               navigation.navigate('Gemini', {robot: selectedRobot});
             }
           }}
