@@ -11,7 +11,7 @@ axios.interceptors.request.use(
   async config => {
     const url = config.url;
     console.info('API request url -->', url);
-    console.info('API request params --> ', config.params);
+    console.info('API request params --> ', config.data);
     console.info('API request headers --> ', config.headers);
     return config;
   },

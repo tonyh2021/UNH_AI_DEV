@@ -118,15 +118,15 @@ const Gemini = () => {
             backgroundColor: robot.primary,
           },
           left: {
-            backgroundColor: '#f0f0f0',
+            backgroundColor: appStyles.color.lightGrey,
           },
         }}
         textStyle={{
           right: {
-            color: '#fff',
+            color: appStyles.color.background,
           },
           left: {
-            color: '#000',
+            color: appStyles.color.primary,
           },
         }}
       />
@@ -148,12 +148,12 @@ const Gemini = () => {
       <InputToolbar
         {...props}
         containerStyle={{
-          backgroundColor: '#fff',
-          borderTopColor: '#E8E8E8',
+          backgroundColor: appStyles.color.background,
+          borderTopColor: appStyles.color.lightGrey,
           borderTopWidth: 1,
         }}
         textInputStyle={{
-          color: '#000',
+          color: appStyles.color.primary,
         }}
       />
     );
@@ -175,8 +175,8 @@ const Gemini = () => {
         scrollToBottom
         placeholder="Type your message here..."
         timeTextStyle={{
-          right: {color: '#fff'},
-          left: {color: '#666'},
+          right: {color: appStyles.color.background},
+          left: {color: appStyles.color.secondary},
         }}
       />
     </SafeAreaView>
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: '#e0e0e0',
+    borderColor: appStyles.color.lightGrey,
   },
   sendButton: {
     marginRight: 10,
