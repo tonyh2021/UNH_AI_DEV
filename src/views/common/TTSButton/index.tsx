@@ -6,12 +6,15 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {IMessage} from 'react-native-gifted-chat';
 import Icon from 'react-native-remix-icon';
 import Tts from 'react-native-tts';
+import useTtsStore from './useTtsStore';
+import {useShallow} from 'zustand/react/shallow';
 
 interface Props {
   color?: string;
-  text?: string;
+  message: IMessage;
 }
 
 enum TtsStatus {
@@ -22,40 +25,55 @@ enum TtsStatus {
 }
 
 const TTSButton = (props: Props) => {
-  const {color = appStyles.color.primary, text = ''} = props;
+  const {color = appStyles.color.primary, message} = props;
   const [ttsStatus, setTtsStatus] = useState<TtsStatus>(TtsStatus.initiliazing);
 
+  const {speakingId, setSpeakingId} = useTtsStore(
+    useShallow(state => ({
+      speakingId: state.speakingId,
+      setSpeakingId: state.setSpeakingId,
+    })),
+  );
+
   const onStart = () => {
-    console.log('onStart');
+    console.log('onStart', message);
     setTtsStatus(TtsStatus.started);
   };
+
   const onFinish = () => {
     console.log('onFinish');
+    setSpeakingId(null);
     setTtsStatus(TtsStatus.finished);
   };
   const onCancel = () => {
     console.log('onCancel');
+    setSpeakingId(null);
     setTtsStatus(TtsStatus.cancelled);
   };
 
   useEffect(() => {
     Tts.setIgnoreSilentSwitch('ignore');
     Tts.getInitStatus().then(result => {
-      console.log(result);
       Tts.addEventListener('tts-start', onStart);
       Tts.addEventListener('tts-finish', onFinish);
       Tts.addEventListener('tts-cancel', onCancel);
     });
     return () => {
       Tts.stop();
-      Tts.removeEventListener('tts-start', onStart);
-      Tts.removeEventListener('tts-finish', onFinish);
-      Tts.removeEventListener('tts-cancel', onCancel);
+      try {
+        Tts.removeEventListener('tts-start', onStart);
+        Tts.removeEventListener('tts-finish', onFinish);
+        Tts.removeEventListener('tts-cancel', onCancel);
+      } catch (error) {
+        console.log(error);
+      }
     };
   }, []);
 
   const renderIcon = () => {
-    if (ttsStatus === TtsStatus.started) {
+    const isSpeaking =
+      ttsStatus === TtsStatus.started && message._id === speakingId;
+    if (isSpeaking) {
       return (
         <ActivityIndicator
           style={{transform: [{scaleX: 0.7}, {scaleY: 0.7}]}}
@@ -70,9 +88,10 @@ const TTSButton = (props: Props) => {
   return (
     <View style={styles.wrap}>
       <TouchableOpacity
-        onPress={async () => {
+        onPress={() => {
           Tts.stop();
-          Tts.speak(text);
+          Tts.speak(message.text);
+          setSpeakingId(message._id);
         }}>
         {renderIcon()}
       </TouchableOpacity>

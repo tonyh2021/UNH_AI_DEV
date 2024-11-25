@@ -83,7 +83,7 @@ const Gemini = () => {
     if (message.user._id !== robot.id) {
       return null;
     }
-    return <TTSButton color={robot.primary} text={message.text}></TTSButton>;
+    return <TTSButton color={robot.primary} message={message}></TTSButton>;
   };
 
   const onSend = useCallback((newMessages: IMessage[]) => {
