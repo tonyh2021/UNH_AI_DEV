@@ -1,6 +1,11 @@
 import appStyles from '@/utils/styleHelper';
 import {useEffect, useState} from 'react';
-import {Platform, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Icon from 'react-native-remix-icon';
 import Tts from 'react-native-tts';
 
@@ -49,6 +54,19 @@ const TTSButton = (props: Props) => {
     };
   }, []);
 
+  const renderIcon = () => {
+    if (ttsStatus === TtsStatus.started) {
+      return (
+        <ActivityIndicator
+          style={{transform: [{scaleX: 0.7}, {scaleY: 0.7}]}}
+          size="small"
+          color={color}
+          animating={true}></ActivityIndicator>
+      );
+    }
+    return <Icon name="volume-up-fill" size="16" color={color}></Icon>;
+  };
+
   return (
     <View style={styles.wrap}>
       <TouchableOpacity
@@ -56,7 +74,7 @@ const TTSButton = (props: Props) => {
           Tts.stop();
           Tts.speak(text);
         }}>
-        <Icon name="volume-up-fill" size="16" color={color}></Icon>
+        {renderIcon()}
       </TouchableOpacity>
     </View>
   );
