@@ -29,3 +29,31 @@ export const RobotData: Robot[] = [
     target: 'Gemini',
   },
 ];
+
+export const fetchUserData = () => {
+  const randomIndex = Math.floor(Math.random() * userData.length);
+  return userData[randomIndex];
+};
+
+const userData = [
+  {
+    _id: '101',
+    name: 'Tony',
+    avatar: 'https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_1.png',
+  },
+  {
+    _id: '102',
+    name: 'Tony',
+    avatar: 'https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_2.png',
+  },
+  {
+    _id: '103',
+    name: 'Tony',
+    avatar: 'https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_3.png',
+  },
+  {
+    _id: '104',
+    name: 'Tony',
+    avatar: 'https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_4.png',
+  },
+];

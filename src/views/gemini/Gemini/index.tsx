@@ -1,17 +1,24 @@
-import React, {useState, useCallback, useEffect, useLayoutEffect} from 'react';
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+} from 'react';
 import {StyleSheet, SafeAreaView, View, Image} from 'react-native';
 import {
   GiftedChat,
   Bubble,
   InputToolbar,
   IMessage,
+  Actions,
 } from 'react-native-gifted-chat';
 import {
   useRoute,
   useNavigation,
   NavigationProp,
 } from '@react-navigation/native';
-import {Robot} from '@/utils/RobotData';
+import {fetchUserData, Robot} from '@/utils/RobotData';
 import {requestGemini} from '@/http/GeminiAPI';
 import appStyles from '@/utils/styleHelper';
 import Header from '@/navigation/Header';
@@ -23,6 +30,8 @@ import SendButton from '@/views/common/SendButton';
 import {useShallow} from 'zustand/react/shallow';
 import Tts from 'react-native-tts';
 import useTtsStore, {TtsStatus} from '@/views/common/useTtsStore';
+import ImagePickerButton from '@/views/common/ImagePickerButton';
+import RecordButton from '@/views/common/RecordButton';
 
 interface Props {
   robot: Robot;
@@ -37,6 +46,8 @@ const Gemini = () => {
   const [messages, setMessages] = useState<IMessage[]>([]);
   const messagesRef = React.useRef(messages);
   const [loading, setLoading] = useState(false);
+
+  const currentUserRef = useRef<any>();
 
   const robotUser = {
     _id: robot.id,
@@ -67,6 +78,8 @@ const Gemini = () => {
     };
     setMessages([message]);
     messagesRef.current = [message];
+
+    currentUserRef.current = fetchUserData();
   }, []);
 
   const {ttsStatus, setTtsStatus} = useTtsStore(
@@ -100,20 +113,20 @@ const Gemini = () => {
     };
   }, []);
 
-  useEffect(() => {
-    Tts.setIgnoreSilentSwitch('ignore');
-    Tts.getInitStatus().then(result => {
-      Tts.addEventListener('tts-start', onStart);
-      Tts.addEventListener('tts-finish', onFinish);
-      Tts.addEventListener('tts-cancel', onCancel);
-    });
-    return () => {
-      Tts.stop();
-      Tts.removeEventListener('tts-start', onStart);
-      Tts.removeEventListener('tts-finish', onFinish);
-      Tts.removeEventListener('tts-cancel', onCancel);
-    };
-  }, []);
+  // useEffect(() => {
+  //   Tts.setIgnoreSilentSwitch('ignore');
+  //   Tts.getInitStatus().then(result => {
+  //     Tts.addEventListener('tts-start', onStart);
+  //     Tts.addEventListener('tts-finish', onFinish);
+  //     Tts.addEventListener('tts-cancel', onCancel);
+  //   });
+  //   return () => {
+  //     Tts.stop();
+  //     Tts.removeEventListener('tts-start', onStart);
+  //     Tts.removeEventListener('tts-finish', onFinish);
+  //     Tts.removeEventListener('tts-cancel', onCancel);
+  //   };
+  // }, []);
 
   const updateMessages = (messages: IMessage[]) => {
     setMessages(previousMessages => {
@@ -123,8 +136,29 @@ const Gemini = () => {
     });
   };
 
-  const renderAvatar = () => {
-    return <Image style={styles.avatar} source={{uri: robot.image}} />;
+  const renderAvatar = (props: any) => {
+    if (props.currentMessage.user._id === robot.id) {
+      return <Image style={styles.avatar} source={{uri: robot.image}} />;
+    }
+    return (
+      <Image
+        style={styles.avatar}
+        source={{uri: currentUserRef.current.avatar}}
+      />
+    );
+  };
+
+  const sendImage = async (uri: string) => {
+    const message = {
+      _id: Date.now(),
+      image: uri,
+      createdAt: new Date(),
+      user: currentUserRef.current,
+    } as IMessage;
+    updateMessages([message]);
+    messagesRef.current = [message];
+    setLoading(true);
+    // fetchAPIResponse(message.image);
   };
 
   const onSend = useCallback((newMessages: IMessage[]) => {
@@ -182,22 +216,23 @@ const Gemini = () => {
   };
 
   const renderBubble = (props: any) => {
-    console.log('renderBubble', ttsStatus);
     const backgroundColorLeft =
       ttsStatus === TtsStatus.started &&
       speakingIdRef.current === props.currentMessage._id
         ? robot.primary + '4D'
         : appStyles.color.lightGrey;
+    console.log('message', props.currentMessage);
     return (
       <Bubble
         {...props}
+        position={props.currentMessage.user._id === robot.id ? 'left' : 'right'}
         onLongPress={() => {}}
         onPress={() => {
           speakMessage(props.currentMessage);
         }}
         wrapperStyle={{
           right: {
-            backgroundColor: robot.primary,
+            backgroundColor: robot.primary + 'CC',
           },
           left: {
             backgroundColor: backgroundColorLeft,
@@ -227,9 +262,44 @@ const Gemini = () => {
           backgroundColor: appStyles.color.background,
           borderTopColor: appStyles.color.lightGrey,
           borderTopWidth: 1,
+          paddingLeft: 5,
+          paddingRight: 10,
+          paddingBottom: 10,
         }}
         textInputStyle={{
           color: appStyles.color.primary,
+        }}
+        placeholderTextColor={appStyles.color.secondary}
+        accessoryStyle={{color: appStyles.color.primary}}
+        renderActions={() => {
+          return (
+            <Actions
+              containerStyle={{
+                paddingHorizontal: 0,
+                paddingTop: 4,
+                width: 60,
+                backgroundColor: appStyles.color.background,
+              }}
+              icon={() => (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'flex-start',
+                    alignItems: 'center',
+                  }}>
+                  <ImagePickerButton
+                    color={robot.primary}
+                    onPick={({uri, fileSize}) => {
+                      console.log('onPick', uri, fileSize);
+                      if (uri) {
+                        sendImage(uri);
+                      }
+                    }}></ImagePickerButton>
+                  <RecordButton color={robot.primary}></RecordButton>
+                </View>
+              )}
+            />
+          );
         }}
       />
     );
@@ -241,15 +311,16 @@ const Gemini = () => {
         messages={messages}
         isTyping={loading}
         onSend={onSend}
-        user={{_id: 11}}
         renderBubble={renderBubble}
         renderSend={renderSend}
         renderInputToolbar={renderInputToolbar}
         renderAvatar={renderAvatar}
         showAvatarForEveryMessage={true}
+        showUserAvatar={true}
+        user={currentUserRef.current}
         alwaysShowSend
         scrollToBottom
-        placeholder="Type your message here..."
+        placeholder="Type your message..."
         timeTextStyle={{
           right: {color: appStyles.color.background},
           left: {color: appStyles.color.secondary},

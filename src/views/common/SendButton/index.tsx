@@ -10,7 +10,12 @@ interface Props {
 const SendButton = (props: Props) => {
   const {color = appStyles.color.primary} = props;
   return (
-    <Send {...props}>
+    <Send
+      {...props}
+      containerStyle={{
+        padding: 8,
+        backgroundColor: appStyles.color.background,
+      }}>
       <View style={styles.button}>
         <Icon name="send-plane-fill" size="24" color={color}></Icon>
       </View>
@@ -22,7 +27,6 @@ export default SendButton;
 
 const styles = StyleSheet.create({
   button: {
-    marginRight: 10,
-    marginBottom: 5,
+    backgroundColor: appStyles.color.background,
   },
 });
