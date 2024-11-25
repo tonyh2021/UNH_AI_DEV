@@ -19,8 +19,11 @@ import {HeaderBackButtonProps} from '@react-navigation/elements';
 import BackButton from '@/navigation/BackButton';
 import {RootStackParams} from '@/navigation/types/RootStackParams';
 import {AIMessageType} from '@/http/type';
-import TTSButton from '@/views/common/TTSButton';
 import SendButton from '@/views/common/SendButton';
+import useTtsStore, {TtsStatus} from '@/views/common/TTSButton/useTtsStore';
+import {useShallow} from 'zustand/react/shallow';
+import Tts from 'react-native-tts';
+import {delayFunc} from '@/utils/delayFunc';
 
 interface Props {
   robot: Robot;
@@ -67,6 +70,52 @@ const Gemini = () => {
     messagesRef.current = [message];
   }, []);
 
+  const {ttsStatus, setTtsStatus} = useTtsStore(
+    useShallow(state => ({
+      ttsStatus: state.ttsStatus,
+      setTtsStatus: state.setTtsStatus,
+    })),
+  );
+
+  const speakingIdRef = React.useRef<string | number | null>(null);
+
+  const onStart = () => {
+    setTtsStatus(TtsStatus.started);
+  };
+
+  const onFinish = () => {
+    console.log('onFinish');
+    setTtsStatus(TtsStatus.finished);
+    speakingIdRef.current = null;
+  };
+  const onCancel = () => {
+    console.log('onCancel');
+    setTtsStatus(TtsStatus.cancelled);
+    speakingIdRef.current = null;
+  };
+  useEffect(() => {
+    Tts.setIgnoreSilentSwitch('ignore');
+    Tts.getInitStatus().then(result => {});
+    return () => {
+      Tts.stop();
+    };
+  }, []);
+
+  useEffect(() => {
+    Tts.setIgnoreSilentSwitch('ignore');
+    Tts.getInitStatus().then(result => {
+      Tts.addEventListener('tts-start', onStart);
+      Tts.addEventListener('tts-finish', onFinish);
+      Tts.addEventListener('tts-cancel', onCancel);
+    });
+    return () => {
+      Tts.stop();
+      Tts.removeEventListener('tts-start', onStart);
+      Tts.removeEventListener('tts-finish', onFinish);
+      Tts.removeEventListener('tts-cancel', onCancel);
+    };
+  }, []);
+
   const updateMessages = (messages: IMessage[]) => {
     setMessages(previousMessages => {
       const updatedMessages = GiftedChat.append(previousMessages, messages);
@@ -77,13 +126,6 @@ const Gemini = () => {
 
   const renderAvatar = () => {
     return <Image style={styles.avatar} source={{uri: robot.image}} />;
-  };
-
-  const renderTTSButton = (message: IMessage) => {
-    if (message.user._id !== robot.id) {
-      return null;
-    }
-    return <TTSButton color={robot.primary} message={message}></TTSButton>;
   };
 
   const onSend = useCallback((newMessages: IMessage[]) => {
@@ -128,17 +170,38 @@ const Gemini = () => {
     }
   };
 
+  const speakMessage = (message: IMessage) => {
+    if (speakingIdRef.current === message._id) {
+      return;
+    }
+    if (ttsStatus === TtsStatus.started) {
+      Tts.stop();
+    } else {
+      Tts.speak(message.text);
+      speakingIdRef.current = message._id;
+    }
+  };
+
   const renderBubble = (props: any) => {
+    console.log('renderBubble', ttsStatus);
+    const backgroundColorLeft =
+      ttsStatus === TtsStatus.started &&
+      speakingIdRef.current === props.currentMessage._id
+        ? robot.primary + '4D'
+        : appStyles.color.lightGrey;
     return (
       <Bubble
         {...props}
-        renderTicks={renderTTSButton}
+        onLongPress={() => {}}
+        onPress={() => {
+          speakMessage(props.currentMessage);
+        }}
         wrapperStyle={{
           right: {
             backgroundColor: robot.primary,
           },
           left: {
-            backgroundColor: appStyles.color.lightGrey,
+            backgroundColor: backgroundColorLeft,
           },
         }}
         textStyle={{
@@ -191,6 +254,9 @@ const Gemini = () => {
         timeTextStyle={{
           right: {color: appStyles.color.background},
           left: {color: appStyles.color.secondary},
+        }}
+        shouldUpdateMessage={(props, nextProps) => {
+          return true;
         }}
       />
     </SafeAreaView>

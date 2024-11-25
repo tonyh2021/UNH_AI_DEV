@@ -9,7 +9,7 @@ import {
 import {IMessage} from 'react-native-gifted-chat';
 import Icon from 'react-native-remix-icon';
 import Tts from 'react-native-tts';
-import useTtsStore from './useTtsStore';
+import useTtsStore, {TtsState} from './useTtsStore';
 import {useShallow} from 'zustand/react/shallow';
 
 interface Props {
@@ -17,38 +17,37 @@ interface Props {
   message: IMessage;
 }
 
-enum TtsStatus {
-  initiliazing = 'initiliazing',
-  started = 'started',
-  finished = 'finished',
-  cancelled = 'cancelled',
-}
-
 const TTSButton = (props: Props) => {
   const {color = appStyles.color.primary, message} = props;
-  const [ttsStatus, setTtsStatus] = useState<TtsStatus>(TtsStatus.initiliazing);
 
-  const {speakingId, setSpeakingId} = useTtsStore(
+  const {ttsStatus, setTtsStatus} = useTtsStore(
     useShallow(state => ({
-      speakingId: state.speakingId,
-      setSpeakingId: state.setSpeakingId,
+      ttsStatus: state.ttsStatus,
+      setTtsStatus: state.setTtsStatus,
     })),
   );
 
   const onStart = () => {
     console.log('onStart', message);
-    setTtsStatus(TtsStatus.started);
+    setTtsStatus({
+      ...ttsStatus,
+      status: TtsState.started,
+    });
   };
 
   const onFinish = () => {
     console.log('onFinish');
-    setSpeakingId(null);
-    setTtsStatus(TtsStatus.finished);
+    setTtsStatus({
+      speakingId: null,
+      status: TtsState.finished,
+    });
   };
   const onCancel = () => {
     console.log('onCancel');
-    setSpeakingId(null);
-    setTtsStatus(TtsStatus.cancelled);
+    setTtsStatus({
+      speakingId: null,
+      status: TtsState.cancelled,
+    });
   };
 
   useEffect(() => {
@@ -72,7 +71,9 @@ const TTSButton = (props: Props) => {
 
   const renderIcon = () => {
     const isSpeaking =
-      ttsStatus === TtsStatus.started && message._id === speakingId;
+      ttsStatus.status === TtsState.started &&
+      message._id === ttsStatus.speakingId;
+    console.log('isSpeaking', isSpeaking);
     if (isSpeaking) {
       return (
         <ActivityIndicator
@@ -91,7 +92,10 @@ const TTSButton = (props: Props) => {
         onPress={() => {
           Tts.stop();
           Tts.speak(message.text);
-          setSpeakingId(message._id);
+          setTtsStatus({
+            ...ttsStatus,
+            speakingId: message._id,
+          });
         }}>
         {renderIcon()}
       </TouchableOpacity>

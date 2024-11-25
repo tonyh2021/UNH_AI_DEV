@@ -1,29 +1,20 @@
 import {create} from 'zustand';
-import Tts from 'react-native-tts';
+
+export enum TtsStatus {
+  initiliazing = 'initiliazing',
+  started = 'started',
+  finished = 'finished',
+  cancelled = 'cancelled',
+}
 
 interface TtsStore {
-  speakingId: string | number | null;
-  setSpeakingId: (id: string | number | null) => void;
-  ttsStatus: string;
-  setTtsStatus: (status: string) => void;
-  startTts: (text: string) => void;
-  stopTts: () => void;
+  ttsStatus: TtsStatus;
+  setTtsStatus: (status: TtsStatus) => void;
 }
 
 const useTtsStore = create<TtsStore>(set => ({
-  speakingId: null,
-  ttsStatus: 'initiliazing',
-  setSpeakingId: id => set({speakingId: id}),
+  ttsStatus: TtsStatus.initiliazing,
   setTtsStatus: status => set({ttsStatus: status}),
-  startTts: text => {
-    Tts.stop();
-    Tts.speak(text);
-    set({ttsStatus: 'started'});
-  },
-  stopTts: () => {
-    Tts.stop();
-    set({ttsStatus: 'finished'});
-  },
 }));
 
 export default useTtsStore;
