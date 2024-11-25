@@ -20,10 +20,9 @@ import BackButton from '@/navigation/BackButton';
 import {RootStackParams} from '@/navigation/types/RootStackParams';
 import {AIMessageType} from '@/http/type';
 import SendButton from '@/views/common/SendButton';
-import useTtsStore, {TtsStatus} from '@/views/common/TTSButton/useTtsStore';
 import {useShallow} from 'zustand/react/shallow';
 import Tts from 'react-native-tts';
-import {delayFunc} from '@/utils/delayFunc';
+import useTtsStore, {TtsStatus} from '@/views/common/useTtsStore';
 
 interface Props {
   robot: Robot;
