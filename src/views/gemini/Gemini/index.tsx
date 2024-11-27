@@ -29,8 +29,7 @@ import SendButton from '@/views/common/SendButton';
 import {useShallow} from 'zustand/react/shallow';
 import Tts from 'react-native-tts';
 import useTtsStore, {TtsStatus} from '@/views/common/useTtsStore';
-import ImagePickerButton from '@/views/common/ImagePickerButton';
-import SpeechButton from '@/views/common/SpeechButton';
+import ToolbarActions from '@/views/common/ToolbarActions';
 
 interface Props {
   robot: Robot;
@@ -112,20 +111,20 @@ const Gemini = () => {
     };
   }, []);
 
-  // useEffect(() => {
-  //   Tts.setIgnoreSilentSwitch('ignore');
-  //   Tts.getInitStatus().then(result => {
-  //     Tts.addEventListener('tts-start', onStart);
-  //     Tts.addEventListener('tts-finish', onFinish);
-  //     Tts.addEventListener('tts-cancel', onCancel);
-  //   });
-  //   return () => {
-  //     Tts.stop();
-  //     Tts.removeEventListener('tts-start', onStart);
-  //     Tts.removeEventListener('tts-finish', onFinish);
-  //     Tts.removeEventListener('tts-cancel', onCancel);
-  //   };
-  // }, []);
+  useEffect(() => {
+    Tts.setIgnoreSilentSwitch('ignore');
+    Tts.getInitStatus().then(result => {
+      Tts.addEventListener('tts-start', onStart);
+      Tts.addEventListener('tts-finish', onFinish);
+      Tts.addEventListener('tts-cancel', onCancel);
+    });
+    return () => {
+      Tts.stop();
+      Tts.removeEventListener('tts-start', onStart);
+      Tts.removeEventListener('tts-finish', onFinish);
+      Tts.removeEventListener('tts-cancel', onCancel);
+    };
+  }, []);
 
   const updateMessages = (messages: UIMessage[]) => {
     setMessages(previousMessages => {
@@ -271,50 +270,24 @@ const Gemini = () => {
       <InputToolbar
         {...props}
         containerStyle={{
-          backgroundColor: appStyles.color.background,
-          borderTopColor: appStyles.color.lightGrey,
-          borderTopWidth: 1,
-          paddingLeft: 5,
-          paddingRight: 10,
-          paddingBottom: 10,
+          apply: styles.toolBar,
         }}
         textInputStyle={{
           color: appStyles.color.primary,
         }}
-        placeholderTextColor={appStyles.color.secondary}
-        accessoryStyle={{color: appStyles.color.primary}}
         renderActions={() => {
           return (
-            <Actions
-              containerStyle={{
-                paddingHorizontal: 0,
-                paddingTop: 4,
-                width: 60,
-                backgroundColor: appStyles.color.background,
+            <ToolbarActions
+              color={robot.primary}
+              onPickImage={({uri, fileSize, base64, type}) => {
+                console.log('onPick', uri, fileSize);
+                if (uri) {
+                  sendImage(uri, base64, type);
+                }
               }}
-              icon={() => (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'flex-start',
-                    alignItems: 'center',
-                  }}>
-                  <ImagePickerButton
-                    color={robot.primary}
-                    onPick={({uri, fileSize, base64, type}) => {
-                      console.log('onPick', uri, fileSize);
-                      if (uri) {
-                        sendImage(uri, base64, type);
-                      }
-                    }}></ImagePickerButton>
-                  <SpeechButton
-                    color={robot.primary}
-                    recognizeCallback={text => {
-                      console.log('recognizeCallback', text);
-                    }}></SpeechButton>
-                </View>
-              )}
-            />
+              onRecognize={text => {
+                console.log('recognizeCallback', text);
+              }}></ToolbarActions>
           );
         }}
       />
@@ -362,5 +335,13 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 2,
     borderColor: appStyles.color.lightGrey,
+  },
+  toolBar: {
+    backgroundColor: appStyles.color.background,
+    borderTopColor: appStyles.color.lightGrey,
+    borderTopWidth: 1,
+    paddingLeft: 5,
+    paddingRight: 10,
+    paddingBottom: 10,
   },
 });
