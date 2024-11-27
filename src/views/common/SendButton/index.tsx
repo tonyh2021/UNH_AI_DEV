@@ -5,10 +5,11 @@ import Icon from 'react-native-remix-icon';
 
 interface Props {
   color?: string;
+  disabled: boolean;
 }
 
 const SendButton = (props: Props) => {
-  const {color = appStyles.color.primary} = props;
+  const {color = appStyles.color.primary, disabled} = props;
   return (
     <Send
       {...props}
@@ -17,7 +18,10 @@ const SendButton = (props: Props) => {
         backgroundColor: appStyles.color.background,
       }}>
       <View style={styles.button}>
-        <Icon name="send-plane-fill" size="24" color={color}></Icon>
+        <Icon
+          name="send-plane-fill"
+          size="24"
+          color={disabled ? color + '4D' : color}></Icon>
       </View>
     </Send>
   );

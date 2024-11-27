@@ -4,18 +4,35 @@ import {AIMessageResponseType, AIMessageType, GeminiModel} from '../type';
 
 const BASE_URL = 'https://generativelanguage.googleapis.com/v1/models';
 
+interface Part {
+  text?: string;
+  inline_data?: {
+    mime_type: string; // MIME of image
+    data: string; // Base64 of image
+  };
+}
+
 export const requestGemini = async (params: {
   model?: GeminiModel;
   messages: AIMessageType[];
 }): Promise<AIMessageResponseType> => {
-  const {model = GeminiModel.GEMINI_PRO, messages} = params;
+  const {model = GeminiModel.GEMINI_15_FLASH_8B, messages} = params;
 
-  const contents = [] as {role: string; parts: {text: string}[]}[];
-  messages.map((message, index) => {
-    const parts = [];
-    if (index === messages.length - 1) {
+  const contents = [] as {
+    role: string;
+    parts: Part[];
+  }[];
+  messages.map(message => {
+    const parts = [] as Part[];
+    if (message.imageType && message.base64) {
       parts.push({
-        text: message.text,
+        text: 'Caption this image.',
+      });
+      parts.push({
+        inline_data: {
+          mime_type: message.imageType,
+          data: message.base64,
+        },
       });
     } else {
       parts.push({text: message.text});

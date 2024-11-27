@@ -10,7 +10,6 @@ import {
   GiftedChat,
   Bubble,
   InputToolbar,
-  IMessage,
   Actions,
 } from 'react-native-gifted-chat';
 import {
@@ -25,7 +24,7 @@ import Header from '@/navigation/Header';
 import {HeaderBackButtonProps} from '@react-navigation/elements';
 import BackButton from '@/navigation/BackButton';
 import {RootStackParams} from '@/navigation/types/RootStackParams';
-import {AIMessageType} from '@/http/type';
+import {AIMessageType, GeminiModel, UIMessage} from '@/http/type';
 import SendButton from '@/views/common/SendButton';
 import {useShallow} from 'zustand/react/shallow';
 import Tts from 'react-native-tts';
@@ -43,7 +42,7 @@ const Gemini = () => {
 
   const navigation = useNavigation<NavigationProp<RootStackParams>>();
 
-  const [messages, setMessages] = useState<IMessage[]>([]);
+  const [messages, setMessages] = useState<UIMessage[]>([]);
   const messagesRef = React.useRef(messages);
   const [loading, setLoading] = useState(false);
 
@@ -128,7 +127,7 @@ const Gemini = () => {
   //   };
   // }, []);
 
-  const updateMessages = (messages: IMessage[]) => {
+  const updateMessages = (messages: UIMessage[]) => {
     setMessages(previousMessages => {
       const updatedMessages = GiftedChat.append(previousMessages, messages);
       messagesRef.current = updatedMessages;
@@ -148,33 +147,41 @@ const Gemini = () => {
     );
   };
 
-  const sendImage = async (uri: string) => {
+  const sendImage = async (uri: string, base64?: string, type?: string) => {
     const message = {
       _id: Date.now(),
       image: uri,
+      base64,
+      imageType: type,
       createdAt: new Date(),
       user: currentUserRef.current,
-    } as IMessage;
+    } as UIMessage;
     updateMessages([message]);
     messagesRef.current = [message];
     setLoading(true);
-    // fetchAPIResponse(message.image);
+
+    console.log('base64 length', base64?.length);
+    console.log('base64 type', type);
+
+    fetchAPIResponse();
   };
 
-  const onSend = useCallback((newMessages: IMessage[]) => {
+  const onSend = useCallback((newMessages: UIMessage[]) => {
     updateMessages(newMessages);
     setLoading(true);
     if (newMessages[0]?.text) {
-      fetchAPIResponse(newMessages[0].text);
+      fetchAPIResponse();
     }
   }, []);
 
-  const fetchAPIResponse = async (text: string) => {
+  const fetchAPIResponse = async () => {
     const aiMessages = [] as AIMessageType[];
     for (const message of messagesRef.current) {
       aiMessages.push({
         text: message.text,
         role: message.user._id === robot.id ? 'model' : 'user',
+        imageType: message.imageType,
+        base64: message.base64,
       });
     }
 
@@ -203,7 +210,7 @@ const Gemini = () => {
     }
   };
 
-  const speakMessage = (message: IMessage) => {
+  const speakMessage = (message: UIMessage) => {
     if (speakingIdRef.current === message._id) {
       return;
     }
@@ -251,7 +258,12 @@ const Gemini = () => {
   };
 
   const renderSend = (props: any) => {
-    return <SendButton {...props} color={robot.primary}></SendButton>;
+    return (
+      <SendButton
+        {...props}
+        color={robot.primary}
+        disabled={loading}></SendButton>
+    );
   };
 
   const renderInputToolbar = (props: any) => {
@@ -289,10 +301,10 @@ const Gemini = () => {
                   }}>
                   <ImagePickerButton
                     color={robot.primary}
-                    onPick={({uri, fileSize}) => {
+                    onPick={({uri, fileSize, base64, type}) => {
                       console.log('onPick', uri, fileSize);
                       if (uri) {
-                        sendImage(uri);
+                        sendImage(uri, base64, type);
                       }
                     }}></ImagePickerButton>
                   <SpeechButton

@@ -16,13 +16,19 @@ const ImagePickerButton = (props: Props) => {
   const actionSheetRef = useRef<ActionSheetRef>(null);
   const insets = useSafeAreaInsets();
 
+  const commonOptions = {
+    mediaType: 'photo',
+    presentationStyle: 'fullScreen',
+    maxWidth: 1024,
+    maxHeight: 1024,
+    quality: 0.7,
+    includeBase64: true,
+  } as ImagePicker.OptionsCommon;
+
   const pickFromCamera = async () => {
     try {
       const options = {
-        mediaType: 'photo',
-        presentationStyle: 'fullScreen',
-        maxWidth: 1024,
-        maxHeight: 1024,
+        ...commonOptions,
         saveToPhotos: false,
       } as ImagePicker.CameraOptions;
       const response = await ImagePicker.launchCamera(options);
@@ -42,10 +48,7 @@ const ImagePickerButton = (props: Props) => {
   const pickFromAlbum = async () => {
     try {
       const options = {
-        mediaType: 'photo',
-        presentationStyle: 'fullScreen',
-        maxWidth: 1024,
-        maxHeight: 1024,
+        ...commonOptions,
       } as ImagePicker.ImageLibraryOptions;
       const response = await ImagePicker.launchImageLibrary(options);
       if (response.assets && response.assets.length > 0) {
