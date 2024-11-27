@@ -15,8 +15,7 @@ export const requestGemini = async (params: {
     const parts = [];
     if (index === messages.length - 1) {
       parts.push({
-        text:
-          message.text + '. Please generate a text of no more than 100 words',
+        text: message.text,
       });
     } else {
       parts.push({text: message.text});

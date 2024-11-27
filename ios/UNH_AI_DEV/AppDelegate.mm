@@ -24,6 +24,7 @@
 #if DEBUG
   NSString *jsLocation = @"localhost";
   jsLocation = @"192.168.2.32";
+//  jsLocation = @"10.10.20.65";
   [[RCTBundleURLProvider sharedSettings] setJsLocation:jsLocation];
   [[RCTBundleURLProvider sharedSettings] setEnableDev:YES];
   NSURL *url = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index"];

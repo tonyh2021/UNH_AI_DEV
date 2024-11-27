@@ -31,7 +31,7 @@ import {useShallow} from 'zustand/react/shallow';
 import Tts from 'react-native-tts';
 import useTtsStore, {TtsStatus} from '@/views/common/useTtsStore';
 import ImagePickerButton from '@/views/common/ImagePickerButton';
-import RecordButton from '@/views/common/RecordButton';
+import SpeechButton from '@/views/common/SpeechButton';
 
 interface Props {
   robot: Robot;
@@ -295,7 +295,11 @@ const Gemini = () => {
                         sendImage(uri);
                       }
                     }}></ImagePickerButton>
-                  <RecordButton color={robot.primary}></RecordButton>
+                  <SpeechButton
+                    color={robot.primary}
+                    recognizeCallback={text => {
+                      console.log('recognizeCallback', text);
+                    }}></SpeechButton>
                 </View>
               )}
             />
