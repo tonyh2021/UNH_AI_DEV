@@ -4,27 +4,42 @@ import {AIMessageResponseType, AIMessageType, OpenAIModel} from '../type';
 
 const BASE_URL = 'https://api.openai.com/v1/chat/completions';
 
+interface Content {
+  type: string;
+  text?: string;
+  image_url?: {
+    url: string; // Base64 of image, data:image/jpeg;base64,...
+  };
+}
+
 export const requestOpenai = async (params: {
   model?: OpenAIModel;
   messages: AIMessageType[];
 }): Promise<AIMessageResponseType> => {
-  const {model = OpenAIModel.GPT3_4_MINI, messages} = params;
+  const {model = OpenAIModel.GPT_4_MINI, messages} = params;
 
   const contents = [] as {
     role: string;
-    content: {type: string; text: string}[];
+    content: Content[];
   }[];
-  messages.map((message, index) => {
-    const content = [];
-    if (index === messages.length - 1) {
+  messages.map(message => {
+    const content = [] as Content[];
+
+    if (message.imageType && message.base64) {
       content.push({
         type: 'text',
-        text:
-          message.text + '. Please generate a text of no more than 100 words',
+        text: 'Caption this image.',
+      });
+      content.push({
+        type: 'image_url',
+        image_url: {
+          url: `data:${message.imageType};base64, ${message.base64}`,
+        },
       });
     } else {
       content.push({type: 'text', text: message.text});
     }
+
     contents.push({role: message.role, content});
   });
 
