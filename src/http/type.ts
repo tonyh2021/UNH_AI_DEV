@@ -1,5 +1,10 @@
 import {IMessage} from 'react-native-gifted-chat';
 
+export enum AIPlatformType {
+  OpenAI = 'openai',
+  Gemini = 'gemini',
+}
+
 export enum OpenAIModel {
   GPT_4_MINI = 'gpt-4o-mini',
   GPT_35_TURBO = 'gpt-3.5-turbo',

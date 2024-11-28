@@ -1,9 +1,11 @@
+import {AIPlatformType} from '@/http/type';
+
 export type Robot = {
   id: string;
   name: string;
   image: string;
   primary: string;
-  target: 'OpenAI' | 'Gemini' | 'Other';
+  target: AIPlatformType;
 };
 
 export const RobotData: Robot[] = [
@@ -12,21 +14,21 @@ export const RobotData: Robot[] = [
     name: 'Nova',
     image: 'https://tonyh2021.github.io/images/ai/avatar/robot1.png',
     primary: '#2864f0',
-    target: 'OpenAI',
+    target: AIPlatformType.OpenAI,
   },
   {
     id: '20',
     name: 'Echo',
     image: 'https://tonyh2021.github.io/images/ai/avatar/robot2.png',
     primary: '#994aff',
-    target: 'Gemini',
+    target: AIPlatformType.Gemini,
   },
   {
     id: '30',
     name: 'Lumi',
     image: 'https://tonyh2021.github.io/images/ai/avatar/robot3.png',
     primary: '#ff432e',
-    target: 'Gemini',
+    target: AIPlatformType.Gemini,
   },
 ];
 

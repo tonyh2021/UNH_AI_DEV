@@ -1,3 +1,4 @@
+import {AIPlatformType} from '@/http/type';
 import BackButton from '@/navigation/BackButton';
 import Header from '@/navigation/Header';
 import SettingsButton from '@/navigation/SettingsButton';
@@ -77,7 +78,7 @@ const Settings = () => {
   };
 
   const renderContent = () => {
-    if (robot.name === 'Echo') {
+    if (robot.target === AIPlatformType.Gemini) {
       return (
         <ScrollView contentContainerStyle={styles.container}>
           <Text style={styles.title}>Gemini API</Text>
@@ -161,7 +162,7 @@ const Settings = () => {
           </View>
         </ScrollView>
       );
-    } else {
+    } else if (robot.target === AIPlatformType.OpenAI) {
       return (
         <ScrollView contentContainerStyle={styles.container}>
           <Text style={styles.title}>OpenAI API</Text>
