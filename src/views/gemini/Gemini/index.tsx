@@ -5,13 +5,8 @@ import React, {
   useLayoutEffect,
   useRef,
 } from 'react';
-import {StyleSheet, SafeAreaView, View, Image} from 'react-native';
-import {
-  GiftedChat,
-  Bubble,
-  InputToolbar,
-  Actions,
-} from 'react-native-gifted-chat';
+import {StyleSheet, SafeAreaView, Image} from 'react-native';
+import {GiftedChat, Bubble, InputToolbar} from 'react-native-gifted-chat';
 import {
   useRoute,
   useNavigation,
@@ -24,7 +19,7 @@ import Header from '@/navigation/Header';
 import {HeaderBackButtonProps} from '@react-navigation/elements';
 import BackButton from '@/navigation/BackButton';
 import {RootStackParams} from '@/navigation/types/RootStackParams';
-import {AIMessageType, GeminiModel, UIMessage} from '@/http/type';
+import {AIMessageType, UIMessage} from '@/http/type';
 import SendButton from '@/views/common/SendButton';
 import {useShallow} from 'zustand/react/shallow';
 import Tts from 'react-native-tts';
