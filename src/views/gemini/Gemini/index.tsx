@@ -26,6 +26,7 @@ import Tts from 'react-native-tts';
 import useTtsStore, {TtsStatus} from '@/views/common/useTtsStore';
 import ToolbarActions from '@/views/common/ToolbarActions';
 import DismissButton from '@/views/common/DismissButton';
+import SettingsButton from '@/navigation/SettingsButton';
 
 interface Props {
   robot: Robot;
@@ -53,6 +54,14 @@ const Gemini = () => {
     navigation.setOptions({
       headerLeft: (props: HeaderBackButtonProps) => (
         <BackButton {...props} tintColor={robot.primary} />
+      ),
+      headerRight: (props: HeaderBackButtonProps) => (
+        <SettingsButton
+          tintColor={robot.primary}
+          onPress={() => {
+            navigation.navigate('Settings', {robot});
+          }}
+        />
       ),
       headerTitle: () =>
         Header({
@@ -169,6 +178,22 @@ const Gemini = () => {
       fetchAPIResponse();
     }
   }, []);
+
+  const sendMessage = (text?: string) => {
+    if (!text) {
+      return;
+    }
+    const message = {
+      _id: Date.now(),
+      text,
+      createdAt: new Date(),
+      user: currentUserRef.current,
+    } as UIMessage;
+    updateMessages([message]);
+    messagesRef.current = [message];
+    setLoading(true);
+    fetchAPIResponse();
+  };
 
   const fetchAPIResponse = async () => {
     const aiMessages = [] as AIMessageType[];

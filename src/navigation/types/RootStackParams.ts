@@ -8,4 +8,5 @@ export type RootStackParams = {
   EmptyPage: undefined;
   RNIntro: undefined;
   MessageDemo: undefined;
+  Settings: {robot: Robot};
 };

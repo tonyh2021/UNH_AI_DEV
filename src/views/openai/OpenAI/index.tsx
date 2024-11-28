@@ -32,6 +32,7 @@ import ToolbarActions from '@/views/common/ToolbarActions';
 import {requestOpenai} from '@/http/OpenaiAPI';
 import {Keyboard} from 'react-native';
 import DismissButton from '@/views/common/DismissButton';
+import SettingsButton from '@/navigation/SettingsButton';
 
 interface Props {
   robot: Robot;
@@ -59,6 +60,14 @@ const OpenAI = () => {
     navigation.setOptions({
       headerLeft: (props: HeaderBackButtonProps) => (
         <BackButton {...props} tintColor={robot.primary} />
+      ),
+      headerRight: (props: HeaderBackButtonProps) => (
+        <SettingsButton
+          tintColor={robot.primary}
+          onPress={() => {
+            navigation.navigate('Settings', {robot});
+          }}
+        />
       ),
       headerTitle: () =>
         Header({
