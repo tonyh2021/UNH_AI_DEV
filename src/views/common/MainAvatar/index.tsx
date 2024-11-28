@@ -77,16 +77,13 @@ const MainAvatar = (props: Props) => {
           setText(prev => prev + fullText[indexRef.current]); // Add one character at a time
           indexRef.current++;
         } else if (indexRef.current < fullText.length + interval) {
-          console.log('currentIndex 0', indexRef.current);
           indexRef.current++;
         } else if (indexRef.current < fullText.length + interval) {
-          console.log('currentIndex 1', indexRef.current);
           indexRef.current++;
         } else if (
           indexRef.current <
           fullText.length + fullSubtitle.length + interval
         ) {
-          console.log('currentIndex 2', indexRef.current);
           setSubtitle(
             prev =>
               prev +

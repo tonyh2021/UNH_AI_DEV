@@ -1,5 +1,5 @@
 import appStyles from '@/utils/styleHelper';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Keyboard, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-remix-icon';
 import * as ImagePicker from 'react-native-image-picker';
 import React, {useRef} from 'react';
@@ -69,6 +69,7 @@ const ImagePickerButton = (props: Props) => {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
+          Keyboard.dismiss();
           actionSheetRef.current?.show();
         }}>
         <Icon name="image-ai-fill" size="22" color={color}></Icon>
@@ -80,7 +81,7 @@ const ImagePickerButton = (props: Props) => {
             onPress={async () => {
               try {
                 const result = await pickFromCamera();
-                console.log('pickFromCamera res', result);
+                console.log('pickFromCamera res', result?.uri);
                 if (result) {
                   props.onPick?.(result);
                 }
@@ -101,7 +102,7 @@ const ImagePickerButton = (props: Props) => {
             onPress={async () => {
               try {
                 const result = await pickFromAlbum();
-                console.log('pickFromAlbum res', result);
+                console.log('pickFromAlbum res', result?.uri);
                 if (result) {
                   props.onPick?.(result);
                 }

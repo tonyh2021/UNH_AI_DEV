@@ -1,7 +1,14 @@
 import appStyles from '@/utils/styleHelper';
 import {useEffect, useRef, useState} from 'react';
 import LottieView from 'lottie-react-native';
-import {Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Keyboard,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Icon from 'react-native-remix-icon';
 import ActionSheet, {ActionSheetRef} from 'react-native-actions-sheet';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -159,6 +166,7 @@ const SpeechButton = (props: Props) => {
       <TouchableOpacity
         style={styles.button}
         onPress={async () => {
+          Keyboard.dismiss();
           actionSheetRef.current?.show();
           setSpeechResult(undefined);
           setShowWave(false);
