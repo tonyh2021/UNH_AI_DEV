@@ -46,7 +46,44 @@ If everything is set up _correctly_, you should see your new app running in your
 
 This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
 
-## Step 3: Adding your API key
+## Step 3: Post-install Steps
+
+### iOS
+
+Add the appropriate keys to your `Info.plist` depending on your requirement:
+
+| Requirement                    | Key                                                     |
+| ------------------------------ | ------------------------------------------------------- |
+| Select image/video from photos | NSPhotoLibraryUsageDescription                          |
+| Capture Image                  | NSCameraUsageDescription                                |
+| Capture Video                  | NSCameraUsageDescription & NSMicrophoneUsageDescription |
+| Speech Recognition             | NSSpeechRecognitionUsageDescription                     |
+
+### Android
+
+No permissions required (`saveToPhotos` requires permission [check](#note-on-file-storage)).
+
+Note: This library does not require `Manifest.permission.CAMERA`, if your app declares as using this permission in manifest then you have to obtain the permission before using `launchCamera`.
+
+#### Targeting Android API Levels Below 30
+
+If your app's `minSdkVersion` is set to below 30 and it does not already include or depend on `androidx.activity:activity:1.9.+` or a newer version, you'll need to add the following line to the dependencies section of your `app/build.gradle` file to ensure support for the backported AndroidX Photo Picker:
+
+```groovy
+dependencies {
+    ...
+    implementation("androidx.activity:activity:1.9.+")
+    ...
+}
+```
+
+**Notes on Android**
+
+Even after all the permissions are correct in Android, there is one last thing to make sure this libray is working fine on Android. Please make sure the device has Google Speech Recognizing Engine such as `com.google.android.googlequicksearchbox` by calling `Voice.getSpeechRecognitionServices()`. Since Android phones can be configured with so many options, even if a device has googlequicksearchbox engine, it could be configured to use other services. You can check which serivce is used for Voice Assistive App in following steps for most Android phones:
+
+`Settings > App Management > Default App > Assistive App and Voice Input > Assistive App`
+
+## Step 4: Adding your API key
 
 Create a .env file in the root directory of the project and add your AI platform's API key. As shown in the code below:
 
