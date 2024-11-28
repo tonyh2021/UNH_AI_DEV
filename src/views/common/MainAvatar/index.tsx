@@ -6,7 +6,6 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSequence,
-  withTiming,
   withSpring,
 } from 'react-native-reanimated';
 
@@ -42,31 +41,25 @@ const MainAvatar = (props: Props) => {
         }), // Scale back to original size
       );
     }
-  }, [robot, scale]);
-
-  const [text, setText] = useState(''); // State to store the current text to display
-
-  // Shared value for controlling the text animation progress
-  const textProgress = useSharedValue(0);
+  }, [robot]);
 
   // Ref to store the interval ID for cleanup
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Animated style for controlling the text opacity or scaling if needed
-  const textAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: withTiming(textProgress.value, {
-        duration: 500, // Adjust duration to control the speed of text appearance
-      }),
-    };
-  });
+  const [text, setText] = useState(''); // State to store the current text to display
+  const [subtitle, setSubtitle] = useState('');
+  const [ellipses, setEllipses] = useState('');
+  const interval = 10;
+
+  const indexRef = useRef(0);
 
   // Function to simulate typing animation
   useEffect(() => {
     if (robot && robot.name) {
+      indexRef.current = 0;
+
       const fullText = `Hello, I am ${robot.name}`; // Full text to display
-      const totalLength = fullText.length; // Get the total length of the string
-      let currentIndex = 0;
+      const fullSubtitle = `How can I help you?`;
 
       // Clear previous interval if it exists
       if (intervalRef.current) {
@@ -75,14 +68,31 @@ const MainAvatar = (props: Props) => {
 
       // Clear previous text when robot changes
       setText('');
-      textProgress.value = 0;
+      setSubtitle('');
+      setEllipses('');
 
       // Interval to reveal one character at a time
       intervalRef.current = setInterval(() => {
-        if (currentIndex < totalLength) {
-          setText(prev => prev + fullText[currentIndex]); // Add one character at a time
-          textProgress.value = (currentIndex + 1) / totalLength; // Update progress for opacity effect
-          currentIndex++;
+        if (indexRef.current < fullText.length) {
+          setText(prev => prev + fullText[indexRef.current]); // Add one character at a time
+          indexRef.current++;
+        } else if (indexRef.current < fullText.length + interval) {
+          console.log('currentIndex 0', indexRef.current);
+          indexRef.current++;
+        } else if (indexRef.current < fullText.length + interval) {
+          console.log('currentIndex 1', indexRef.current);
+          indexRef.current++;
+        } else if (
+          indexRef.current <
+          fullText.length + fullSubtitle.length + interval
+        ) {
+          console.log('currentIndex 2', indexRef.current);
+          setSubtitle(
+            prev =>
+              prev +
+              fullSubtitle[indexRef.current - fullText.length - interval],
+          );
+          indexRef.current++;
         } else {
           // Stop the interval once the entire text is displayed
           if (intervalRef.current) {
@@ -98,7 +108,7 @@ const MainAvatar = (props: Props) => {
         clearInterval(intervalRef.current);
       }
     };
-  }, [robot, textProgress]); // Re-run the effect when `robot` changes
+  }, [robot]); // Re-run the effect when `robot` changes
 
   if (!robot) {
     return <></>;
@@ -110,13 +120,17 @@ const MainAvatar = (props: Props) => {
         source={{uri: robot.image}}
         style={[styles.mainImage, animatedStyle]}
       />
-      <Animated.Text
-        style={[styles.greeting, {color: robot.primary}, textAnimatedStyle]}>
+      <Animated.Text style={[styles.greeting, {color: robot.primary}]}>
         {text}
       </Animated.Text>
-      <Text style={[styles.subtitle, {color: robot.primary}]}>
-        How can I help you?
-      </Text>
+      <View>
+        <Animated.Text style={[styles.subtitle, {color: robot.primary}]}>
+          {subtitle}
+        </Animated.Text>
+        <Animated.Text style={[styles.subtitle, {color: robot.primary}]}>
+          {ellipses}
+        </Animated.Text>
+      </View>
     </View>
   );
 };
@@ -142,6 +156,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 25,
+    height: 30,
   },
 });
 
