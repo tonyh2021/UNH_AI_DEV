@@ -42,14 +42,15 @@ export default ToolbarActions;
 
 const styles = StyleSheet.create({
   action: {
-    paddingHorizontal: 0,
+    paddingHorizontal: 2,
     paddingTop: 4,
     width: 60,
     backgroundColor: appStyles.color.background,
   },
   wrap: {
+    width: '100%',
     flexDirection: 'row',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     alignItems: 'center',
   },
 });

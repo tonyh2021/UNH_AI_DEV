@@ -67,7 +67,6 @@ const ImagePickerButton = (props: Props) => {
   return (
     <>
       <TouchableOpacity
-        style={styles.button}
         onPress={() => {
           Keyboard.dismiss();
           actionSheetRef.current?.show();
@@ -123,9 +122,6 @@ const ImagePickerButton = (props: Props) => {
 export default ImagePickerButton;
 
 const styles = StyleSheet.create({
-  button: {
-    marginRight: 10,
-  },
   actionWrap: {
     justifyContent: 'space-between',
     alignItems: 'center',
