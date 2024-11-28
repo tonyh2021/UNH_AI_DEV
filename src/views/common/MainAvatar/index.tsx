@@ -49,7 +49,7 @@ const MainAvatar = (props: Props) => {
   const [text, setText] = useState(''); // State to store the current text to display
   const [subtitle, setSubtitle] = useState('');
   const [ellipses, setEllipses] = useState('');
-  const interval = 10;
+  const interval = 5;
 
   const indexRef = useRef(0);
 

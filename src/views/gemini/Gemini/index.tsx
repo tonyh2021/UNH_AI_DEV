@@ -5,7 +5,7 @@ import React, {
   useLayoutEffect,
   useRef,
 } from 'react';
-import {StyleSheet, SafeAreaView, Image} from 'react-native';
+import {StyleSheet, SafeAreaView, Image, Keyboard} from 'react-native';
 import {GiftedChat, Bubble, InputToolbar} from 'react-native-gifted-chat';
 import {
   useRoute,
@@ -25,6 +25,7 @@ import {useShallow} from 'zustand/react/shallow';
 import Tts from 'react-native-tts';
 import useTtsStore, {TtsStatus} from '@/views/common/useTtsStore';
 import ToolbarActions from '@/views/common/ToolbarActions';
+import DismissButton from '@/views/common/DismissButton';
 
 interface Props {
   robot: Robot;
@@ -161,6 +162,7 @@ const Gemini = () => {
   };
 
   const onSend = useCallback((newMessages: UIMessage[]) => {
+    Keyboard.dismiss();
     updateMessages(newMessages);
     setLoading(true);
     if (newMessages[0]?.text) {
@@ -265,10 +267,13 @@ const Gemini = () => {
       <InputToolbar
         {...props}
         containerStyle={{
-          apply: styles.toolBar,
+          backgroundColor: appStyles.color.background,
         }}
         textInputStyle={{
           color: appStyles.color.primary,
+          backgroundColor: 'white',
+          paddingHorizontal: 10,
+          borderRadius: 4,
         }}
         renderActions={() => {
           return (
@@ -281,6 +286,7 @@ const Gemini = () => {
                 }
               }}
               onRecognize={text => {
+                sendMessage(text);
                 console.log('recognizeCallback', text);
               }}></ToolbarActions>
           );
@@ -303,7 +309,6 @@ const Gemini = () => {
         showUserAvatar={true}
         user={currentUserRef.current}
         alwaysShowSend
-        scrollToBottom
         placeholder="Type your message..."
         timeTextStyle={{
           right: {color: appStyles.color.background},
@@ -313,6 +318,7 @@ const Gemini = () => {
           return true;
         }}
       />
+      <DismissButton />
     </SafeAreaView>
   );
 };

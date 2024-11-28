@@ -6,7 +6,12 @@ import React, {
   useRef,
 } from 'react';
 import {StyleSheet, SafeAreaView, Image} from 'react-native';
-import {GiftedChat, Bubble, InputToolbar} from 'react-native-gifted-chat';
+import {
+  GiftedChat,
+  Bubble,
+  InputToolbar,
+  Composer,
+} from 'react-native-gifted-chat';
 import {
   useRoute,
   useNavigation,
@@ -25,6 +30,8 @@ import Tts from 'react-native-tts';
 import useTtsStore, {TtsStatus} from '@/views/common/useTtsStore';
 import ToolbarActions from '@/views/common/ToolbarActions';
 import {requestOpenai} from '@/http/OpenaiAPI';
+import {Keyboard} from 'react-native';
+import DismissButton from '@/views/common/DismissButton';
 
 interface Props {
   robot: Robot;
@@ -161,12 +168,29 @@ const OpenAI = () => {
   };
 
   const onSend = useCallback((newMessages: UIMessage[]) => {
+    Keyboard.dismiss();
     updateMessages(newMessages);
     setLoading(true);
     if (newMessages[0]?.text) {
       fetchAPIResponse();
     }
   }, []);
+
+  const sendMessage = (text?: string) => {
+    if (!text) {
+      return;
+    }
+    const message = {
+      _id: Date.now(),
+      text,
+      createdAt: new Date(),
+      user: currentUserRef.current,
+    } as UIMessage;
+    updateMessages([message]);
+    messagesRef.current = [message];
+    setLoading(true);
+    fetchAPIResponse();
+  };
 
   const fetchAPIResponse = async () => {
     const aiMessages = [] as AIMessageType[];
@@ -265,10 +289,13 @@ const OpenAI = () => {
       <InputToolbar
         {...props}
         containerStyle={{
-          apply: styles.toolBar,
+          backgroundColor: appStyles.color.background,
         }}
         textInputStyle={{
           color: appStyles.color.primary,
+          backgroundColor: 'white',
+          paddingHorizontal: 10,
+          borderRadius: 4,
         }}
         renderActions={() => {
           return (
@@ -281,6 +308,7 @@ const OpenAI = () => {
                 }
               }}
               onRecognize={text => {
+                sendMessage(text);
                 console.log('recognizeCallback', text);
               }}></ToolbarActions>
           );
@@ -303,7 +331,6 @@ const OpenAI = () => {
         showUserAvatar={true}
         user={currentUserRef.current}
         alwaysShowSend
-        scrollToBottom
         placeholder="Type your message..."
         timeTextStyle={{
           right: {color: appStyles.color.background},
@@ -313,6 +340,7 @@ const OpenAI = () => {
           return true;
         }}
       />
+      <DismissButton />
     </SafeAreaView>
   );
 };
