@@ -1,4 +1,4 @@
-This is a [**React Native**](https://reactnative.dev) project, primarily focused on calling AI platform([**Open AI**](https://platform.openai.com/docs/overview), [**Gemini**](https://ai.google.dev/gemini-api/docs)) APIs for text, audio, and image processing and interaction.
+This is a [**React Native**](https://reactnative.dev) project, primarily focused on calling AI platforms ([**Open AI**](https://platform.openai.com/docs/overview), [**Gemini**](https://ai.google.dev/gemini-api/docs)) APIs for text, audio, and image processing and interaction, providing core functionalities such as text processing, speech recognition, image recognition, and text-to-speech (TTS), presented as an AI chatbot application.
 
 # Getting Started
 
@@ -85,7 +85,49 @@ Even after all the permissions are correct in Android, there is one last thing t
 
 ## Step 4: Adding your API key
 
-Create a .env file in the root directory of the project and add your AI platform's API key. As shown in the code below:
+This project uses the `react-native-dotenv` library to manage `.env` files. It’s important to securely store your API keys to protect sensitive data. Follow these steps:
+
+### 1. Install `react-native-dotenv`
+
+Install the library using npm or Yarn:
+
+```bash
+# using npm
+npm install react-native-dotenv
+
+# OR using Yarn
+yarn add react-native-dotenv
+```
+
+### 2. Configure Babel
+
+Add the plugin configuration in your `babel.config.js` file:
+
+```javascript
+module.exports = {
+  presets: ['module:metro-react-native-babel-preset'],
+  plugins: [
+    [
+      'module:react-native-dotenv',
+      {
+        moduleName: '@env',
+        path: '.env',
+      },
+    ],
+  ],
+};
+```
+
+### 3. Add `.env` to `.gitignore`
+
+To prevent accidentally committing your `.env` file to version control, open your `.gitignore` file in the root directory and add the following line:
+
+```bash
+# Add this line to .gitignore
+.env
+```
+
+### 4. Create a .env file file in the root directory of your project and add your API keys like this:
 
 ```bash
 GEMINI_API_KEY = your-gemini-api-key
