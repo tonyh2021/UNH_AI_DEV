@@ -1,10 +1,67 @@
 This is a [**React Native**](https://reactnative.dev) project, primarily focused on calling AI platforms ([**Open AI**](https://platform.openai.com/docs/overview), [**Gemini**](https://ai.google.dev/gemini-api/docs)) APIs for text, audio, and image processing and interaction, providing core functionalities such as text processing, speech recognition, image recognition, and text-to-speech (TTS), presented as an AI chatbot application.
 
-# Getting Started
+# React Native Project Setup
 
-> **Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+This guide will walk you through the setup process for an existing React Native project. It assumes you've already cloned the project and have the necessary tools installed. If not, follow the [React Native Environment Setup](https://reactnative.dev/docs/environment-setup) instructions to get started.
 
-## Step 1: Post-install Steps
+## Prerequisites
+
+Ensure that you have the following tools installed:
+
+- **Node.js**: Required for managing dependencies.
+- **npm or Yarn**: A package manager to install project dependencies.
+- **Watchman**: Helps React Native with file system watching on macOS. (Optional but recommended)
+- **JDK**: Java Development Kit (Required for Android development).
+- **Xcode**: Required for iOS development (macOS only).
+- **Android Studio**: Required for Android development.
+
+If you need help installing any of these tools, refer to the [React Native Environment Setup](https://reactnative.dev/docs/environment-setup).
+
+## Step 1: Clone the Project
+
+If you haven't already cloned the project, use the following command to clone the repository:
+
+```bash
+git clone git@github.com:tonyh2021/UNH_AI_DEV.git
+```
+
+Navigate to the project directory:
+
+```bash
+cd UNH_AI_DEV
+```
+
+## Step 1: Install Dependencies
+
+Install the project dependencies using npm or Yarn. This will install all necessary packages listed in `package.json`.
+
+```bash
+# using npm
+npm install
+
+# OR using Yarn
+yarn install
+```
+
+Install iOS Dependencies (Native iOS Setup)
+
+For iOS, follow these steps to install and configure native dependencies:
+
+### 1. Navigate to the iOS Directory
+
+```bash
+cd ios
+```
+
+### 2. Install CocoaPods Dependencies
+
+CocoaPods is a dependency manager for iOS projects. To install all the necessary iOS dependencies for your project, run the following command inside the `ios` directory:
+
+```bash
+pod install
+```
+
+## Step 2: Post-install Steps
 
 ### iOS
 
@@ -41,7 +98,7 @@ Even after all the permissions are correct in Android, there is one last thing t
 
 `Settings > App Management > Default App > Assistive App and Voice Input > Assistive App`
 
-## Step 2: Adding your API key
+## Step 3: Adding your API key
 
 This project uses the `react-native-dotenv` library to manage `.env` files. It’s important to securely store your API keys to protect sensitive data. Follow these steps:
 
@@ -92,7 +149,7 @@ GEMINI_API_KEY = your-gemini-api-key
 OPENAI_API_KEY = your-openai-api-key
 ```
 
-## Step 3: Start the Metro Server
+## Step 4: Start the Metro Server
 
 First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
 
@@ -106,7 +163,7 @@ npm start
 yarn start
 ```
 
-## Step 4: Start your Application
+## Step 5: Start your Application
 
 Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
 
