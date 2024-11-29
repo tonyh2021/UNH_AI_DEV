@@ -75,3 +75,4 @@ bundle/
 !.yarn/versions
 
 .env
+*.pdf
