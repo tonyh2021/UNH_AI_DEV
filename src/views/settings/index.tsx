@@ -1,7 +1,6 @@
 import {AIPlatformType} from '@/http/type';
 import BackButton from '@/navigation/BackButton';
 import Header from '@/navigation/Header';
-import SettingsButton from '@/navigation/SettingsButton';
 import {RootStackParams} from '@/navigation/types/RootStackParams';
 import {Robot} from '@/utils/RobotData';
 import appStyles from '@/utils/styleHelper';
@@ -15,6 +14,7 @@ import * as React from 'react';
 import {Linking, SafeAreaView, StyleSheet, Text, View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import InAppBrowser from 'react-native-inappbrowser-reborn';
+import ModelPicker from '../common/ModelPicker';
 
 interface Props {
   robot: Robot;
@@ -31,13 +31,6 @@ const Settings = () => {
       headerLeft: (props: HeaderBackButtonProps) => (
         <BackButton {...props} tintColor={robot.primary} />
       ),
-      /*************  ✨ Codeium Command ⭐  *************/
-      /**
-       * Header title component, displays the robot's name and image.
-       *
-       * @returns A Header component with the robot's name and image.
-       */
-      /******  279d636d-5d10-4cd7-a36a-2953292843cd  *******/
       headerTitle: () =>
         Header({
           avatar: robot.image,
@@ -241,6 +234,7 @@ const Settings = () => {
               </Text>{' '}
               A fast, inexpensive model for simple tasks.{'\n'}
             </Text>
+            <ModelPicker robot={robot}></ModelPicker>
           </View>
 
           <View style={styles.section}>

@@ -1,6 +1,7 @@
 import {OPENAI_API_KEY} from '@env';
 import axios from 'axios';
 import {AIMessageResponseType, AIMessageType, OpenAIModel} from '../type';
+import {useModelStore} from '../useModelStore';
 
 const BASE_URL = 'https://api.openai.com/v1/chat/completions';
 
@@ -16,7 +17,8 @@ export const requestOpenai = async (params: {
   model?: OpenAIModel;
   messages: AIMessageType[];
 }): Promise<AIMessageResponseType> => {
-  const {model = OpenAIModel.GPT_4_MINI, messages} = params;
+  const model = useModelStore.getState().openAIModel;
+  const {messages} = params;
 
   const contents = [] as {
     role: string;

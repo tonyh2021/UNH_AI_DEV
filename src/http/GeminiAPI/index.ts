@@ -1,6 +1,7 @@
 import {GEMINI_API_KEY} from '@env';
 import axios from 'axios';
 import {AIMessageResponseType, AIMessageType, GeminiModel} from '../type';
+import {useModelStore} from '../useModelStore';
 
 const BASE_URL = 'https://generativelanguage.googleapis.com/v1/models';
 
@@ -13,10 +14,10 @@ interface Part {
 }
 
 export const requestGemini = async (params: {
-  model?: GeminiModel;
   messages: AIMessageType[];
 }): Promise<AIMessageResponseType> => {
-  const {model = GeminiModel.GEMINI_15_FLASH_8B, messages} = params;
+  const model = useModelStore.getState().geminiModel;
+  const {messages} = params;
 
   const contents = [] as {
     role: string;
