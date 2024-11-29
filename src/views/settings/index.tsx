@@ -14,7 +14,7 @@ import * as React from 'react';
 import {Linking, SafeAreaView, StyleSheet, Text, View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import InAppBrowser from 'react-native-inappbrowser-reborn';
-import ModelPicker from '../common/ModelPicker';
+import ModelPicker from '@/views/common/ModelPicker';
 
 interface Props {
   robot: Robot;
@@ -143,6 +143,10 @@ const Settings = () => {
               audio, codebases with 60,000 lines of code, or 2,000 pages of
               text.{'\n'}
             </Text>
+            <Text style={{...styles.bold, paddingBottom: 5}}>
+              Select a Gemini model:
+            </Text>
+            <ModelPicker robot={robot}></ModelPicker>
           </View>
 
           <View style={styles.section}>
@@ -233,6 +237,9 @@ const Settings = () => {
                 GPT-3.5 Turbo:
               </Text>{' '}
               A fast, inexpensive model for simple tasks.{'\n'}
+            </Text>
+            <Text style={{...styles.bold, paddingBottom: 5}}>
+              Select a OpenAI model:
             </Text>
             <ModelPicker robot={robot}></ModelPicker>
           </View>

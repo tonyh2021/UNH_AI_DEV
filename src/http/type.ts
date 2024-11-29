@@ -8,7 +8,7 @@ export enum AIPlatformType {
 export enum OpenAIModel {
   GPT_4_O = 'gpt-4o',
   GPT_4_MINI = 'gpt-4o-mini',
-  GPT_4__TURBO = 'gpt-4-turbo',
+  GPT_4_TURBO = 'gpt-4-turbo',
   GPT_35_TURBO = 'gpt-3.5-turbo',
 }
 

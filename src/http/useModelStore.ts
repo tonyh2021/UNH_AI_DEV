@@ -1,7 +1,7 @@
 import {create} from 'zustand';
 import {OpenAIModel, GeminiModel} from './type';
 
-interface ModelType {
+interface State {
   openAIModel: OpenAIModel;
   setOpenAIModel: (model: OpenAIModel) => void;
 
@@ -9,7 +9,7 @@ interface ModelType {
   setGeminiModel: (model: GeminiModel) => void;
 }
 
-export const useModelStore = create<ModelType>((set, get) => ({
+export const useModelStore = create<State>((set, get) => ({
   openAIModel: OpenAIModel.GPT_4_MINI,
   setOpenAIModel: (model: OpenAIModel) => {
     set({openAIModel: model});
