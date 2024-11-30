@@ -1,6 +1,6 @@
 This is a [**React Native**](https://reactnative.dev) project, primarily focused on calling AI platforms ([**Open AI**](https://platform.openai.com/docs/overview), [**Gemini**](https://ai.google.dev/gemini-api/docs)) APIs for text, audio, and image processing and interaction, providing core functionalities such as text processing, speech recognition, image recognition, and text-to-speech (TTS), presented as an AI chatbot application.
 
-<img src="Screenshot.jpeg" width="300" />
+<iframe src="https://drive.google.com/file/d/1zqfQnXIRaHCQhDe3C1GDrOORWemDDsrx/preview" width="450" height="300"></iframe>
 
 # React Native Project Setup
 
