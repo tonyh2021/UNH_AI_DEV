@@ -1,31 +1,61 @@
+import {AIPlatformType} from '@/http/type';
+
 export type Robot = {
   id: string;
   name: string;
   image: string;
   primary: string;
-  target: 'OpenAI' | 'Other';
+  target: AIPlatformType;
 };
 
 export const RobotData: Robot[] = [
   {
-    id: '0',
+    id: '10',
     name: 'Nova',
     image: 'https://tonyh2021.github.io/images/ai/avatar/robot1.png',
     primary: '#2864f0',
-    target: 'OpenAI',
+    target: AIPlatformType.OpenAI,
   },
   {
-    id: '1',
+    id: '20',
     name: 'Echo',
     image: 'https://tonyh2021.github.io/images/ai/avatar/robot2.png',
     primary: '#994aff',
-    target: 'OpenAI',
+    target: AIPlatformType.Gemini,
   },
   {
-    id: '2',
+    id: '30',
     name: 'Lumi',
     image: 'https://tonyh2021.github.io/images/ai/avatar/robot3.png',
     primary: '#ff432e',
-    target: 'OpenAI',
+    target: AIPlatformType.Gemini,
+  },
+];
+
+export const fetchUserData = () => {
+  const randomIndex = Math.floor(Math.random() * userData.length);
+  return userData[randomIndex];
+};
+
+const userData = [
+  {
+    _id: '101',
+    name: 'Tony',
+    avatar: 'https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_1.png',
+  },
+  {
+    _id: '102',
+    name: 'Tony',
+    avatar: 'https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_2.png',
+  },
+  {
+    _id: '103',
+    name: 'Tony',
+    avatar: 'https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_3.png',
+  },
+  {
+    _id: '104',
+    name: 'Tony',
+    avatar: 'https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_4.png',
   },
 ];

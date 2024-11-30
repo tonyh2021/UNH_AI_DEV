@@ -1,23 +1,52 @@
 import {GEMINI_API_KEY} from '@env';
 import axios from 'axios';
+import {AIMessageResponseType, AIMessageType, GeminiModel} from '../type';
+import {useModelStore} from '../useModelStore';
 
-const BASE_URL =
-  'https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent';
+const BASE_URL = 'https://generativelanguage.googleapis.com/v1/models';
 
-export const requestGemini = async (text: string) => {
+interface Part {
+  text?: string;
+  inline_data?: {
+    mime_type: string; // MIME of image
+    data: string; // Base64 of image
+  };
+}
+
+export const requestGemini = async (params: {
+  messages: AIMessageType[];
+}): Promise<AIMessageResponseType> => {
+  const model = useModelStore.getState().geminiModel;
+  const {messages} = params;
+
+  const contents = [] as {
+    role: string;
+    parts: Part[];
+  }[];
+  messages.map(message => {
+    const parts = [] as Part[];
+    if (message.imageType && message.base64) {
+      parts.push({
+        text: 'Caption this image.',
+      });
+      parts.push({
+        inline_data: {
+          mime_type: message.imageType,
+          data: message.base64,
+        },
+      });
+    } else {
+      parts.push({text: message.text});
+    }
+    contents.push({role: message.role, parts});
+  });
+
+  const url = `${BASE_URL}/${model}:generateContent?key=${GEMINI_API_KEY}`;
   try {
     const response = await axios.post(
-      `${BASE_URL}?key=${GEMINI_API_KEY}`,
+      url,
       {
-        contents: [
-          {
-            parts: [
-              {
-                text,
-              },
-            ],
-          },
-        ],
+        contents,
       },
       {
         headers: {
@@ -33,15 +62,8 @@ export const requestGemini = async (text: string) => {
     ) {
       return {
         data: {
-          contents: [
-            {
-              parts: [
-                {
-                  text: response.data.candidates[0].content.parts[0].text,
-                },
-              ],
-            },
-          ],
+          role: 'model',
+          text: response.data.candidates[0].content.parts[0].text,
         },
       };
     } else {

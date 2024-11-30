@@ -4,7 +4,7 @@ const appStyles = {
     secondary: '#9799AE',
     lightGrey: '#EAEBEF',
     background: '#F9F9FA',
-    error: '#B00020',
+    error: '#FF3335',
   },
   fontWeight: {
     regular: '400' as const,

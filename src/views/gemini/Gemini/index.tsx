@@ -1,25 +1,32 @@
-import React, {useState, useCallback, useEffect, useLayoutEffect} from 'react';
-import {StyleSheet, SafeAreaView, View, Image} from 'react-native';
-import {
-  GiftedChat,
-  Bubble,
-  Send,
-  InputToolbar,
-  IMessage,
-} from 'react-native-gifted-chat';
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+} from 'react';
+import {StyleSheet, SafeAreaView, Image, Keyboard} from 'react-native';
+import {GiftedChat, Bubble, InputToolbar} from 'react-native-gifted-chat';
 import {
   useRoute,
   useNavigation,
   NavigationProp,
 } from '@react-navigation/native';
-import {Robot} from '@/utils/RobotData';
-import Icon from 'react-native-remix-icon';
+import {fetchUserData, Robot} from '@/utils/RobotData';
 import {requestGemini} from '@/http/GeminiAPI';
 import appStyles from '@/utils/styleHelper';
 import Header from '@/navigation/Header';
 import {HeaderBackButtonProps} from '@react-navigation/elements';
 import BackButton from '@/navigation/BackButton';
 import {RootStackParams} from '@/navigation/types/RootStackParams';
+import {AIMessageType, UIMessage} from '@/http/type';
+import SendButton from '@/views/common/SendButton';
+import {useShallow} from 'zustand/react/shallow';
+import Tts from 'react-native-tts';
+import useTtsStore, {TtsStatus} from '@/views/common/useTtsStore';
+import ToolbarActions from '@/views/common/ToolbarActions';
+import DismissButton from '@/views/common/DismissButton';
+import SettingsButton from '@/navigation/SettingsButton';
 
 interface Props {
   robot: Robot;
@@ -31,8 +38,11 @@ const Gemini = () => {
 
   const navigation = useNavigation<NavigationProp<RootStackParams>>();
 
-  const [messages, setMessages] = useState<IMessage[]>([]);
+  const [messages, setMessages] = useState<UIMessage[]>([]);
+  const messagesRef = React.useRef(messages);
   const [loading, setLoading] = useState(false);
+
+  const currentUserRef = useRef<any>();
 
   const robotUser = {
     _id: robot.id,
@@ -45,6 +55,14 @@ const Gemini = () => {
       headerLeft: (props: HeaderBackButtonProps) => (
         <BackButton {...props} tintColor={robot.primary} />
       ),
+      headerRight: (props: HeaderBackButtonProps) => (
+        <SettingsButton
+          tintColor={robot.primary}
+          onPress={() => {
+            navigation.navigate('Settings', {robot});
+          }}
+        />
+      ),
       headerTitle: () =>
         Header({
           avatar: robot.image,
@@ -56,43 +74,149 @@ const Gemini = () => {
 
   useEffect(() => {
     const message = {
-      _id: 0,
+      _id: Date.now(),
       text: `Hello, I am ${robot.name}`,
       createdAt: new Date(),
       user: robotUser,
     };
     setMessages([message]);
+    messagesRef.current = [message];
+
+    currentUserRef.current = fetchUserData();
   }, []);
 
-  const renderAvatar = () => {
-    return <Image style={styles.avatar} source={{uri: robot.image}} />;
+  const {ttsStatus, setTtsStatus} = useTtsStore(
+    useShallow(state => ({
+      ttsStatus: state.ttsStatus,
+      setTtsStatus: state.setTtsStatus,
+    })),
+  );
+
+  const speakingIdRef = React.useRef<string | number | null>(null);
+
+  const onStart = () => {
+    setTtsStatus(TtsStatus.started);
   };
 
-  const onSend = useCallback((newMessages: IMessage[]) => {
-    setMessages(previousMessages =>
-      GiftedChat.append(previousMessages, newMessages),
+  const onFinish = () => {
+    console.log('onFinish');
+    setTtsStatus(TtsStatus.finished);
+    speakingIdRef.current = null;
+  };
+  const onCancel = () => {
+    console.log('onCancel');
+    setTtsStatus(TtsStatus.cancelled);
+    speakingIdRef.current = null;
+  };
+  useEffect(() => {
+    Tts.setIgnoreSilentSwitch('ignore');
+    Tts.getInitStatus().then(result => {});
+    return () => {
+      Tts.stop();
+    };
+  }, []);
+
+  useEffect(() => {
+    Tts.setIgnoreSilentSwitch('ignore');
+    Tts.getInitStatus().then(result => {
+      Tts.addEventListener('tts-start', onStart);
+      Tts.addEventListener('tts-finish', onFinish);
+      Tts.addEventListener('tts-cancel', onCancel);
+    });
+    return () => {
+      Tts.stop();
+      Tts.removeEventListener('tts-start', onStart);
+      Tts.removeEventListener('tts-finish', onFinish);
+      Tts.removeEventListener('tts-cancel', onCancel);
+    };
+  }, []);
+
+  const updateMessages = (messages: UIMessage[]) => {
+    setMessages(previousMessages => {
+      const updatedMessages = GiftedChat.append(previousMessages, messages);
+      messagesRef.current = updatedMessages;
+      return updatedMessages;
+    });
+  };
+
+  const renderAvatar = (props: any) => {
+    if (props.currentMessage.user._id === robot.id) {
+      return <Image style={styles.avatar} source={{uri: robot.image}} />;
+    }
+    return (
+      <Image
+        style={styles.avatar}
+        source={{uri: currentUserRef.current.avatar}}
+      />
     );
+  };
+
+  const sendImage = async (uri: string, base64?: string, type?: string) => {
+    const message = {
+      _id: Date.now(),
+      image: uri,
+      base64,
+      imageType: type,
+      createdAt: new Date(),
+      user: currentUserRef.current,
+    } as UIMessage;
+    updateMessages([message]);
+    messagesRef.current = [message];
+    setLoading(true);
+
+    console.log('base64 length', base64?.length);
+    console.log('base64 type', type);
+
+    fetchAPIResponse();
+  };
+
+  const onSend = useCallback((newMessages: UIMessage[]) => {
+    Keyboard.dismiss();
+    updateMessages(newMessages);
     setLoading(true);
     if (newMessages[0]?.text) {
-      fetchGeminiResponse(newMessages[0].text);
+      fetchAPIResponse();
     }
   }, []);
 
-  const fetchGeminiResponse = async (text: string) => {
+  const sendMessage = (text?: string) => {
+    if (!text) {
+      return;
+    }
+    const message = {
+      _id: Date.now(),
+      text,
+      createdAt: new Date(),
+      user: currentUserRef.current,
+    } as UIMessage;
+    updateMessages([message]);
+    messagesRef.current = [message];
+    setLoading(true);
+    fetchAPIResponse();
+  };
+
+  const fetchAPIResponse = async () => {
+    const aiMessages = [] as AIMessageType[];
+    for (const message of messagesRef.current) {
+      aiMessages.push({
+        text: message.text,
+        role: message.user._id === robot.id ? 'model' : 'user',
+        imageType: message.imageType,
+        base64: message.base64,
+      });
+    }
+
     try {
-      const response = await requestGemini(text);
-      const geminiData =
-        response.data?.contents[0]?.parts[0]?.text ||
-        'Sorry 🙏 No data found 😢';
-      const apiMessage = {
+      const response = await requestGemini({
+        messages: aiMessages.reverse(),
+      });
+      const responseMessage = {
         _id: Date.now(),
-        text: geminiData,
+        text: response.data.text || 'Sorry. No data was found 😢',
         createdAt: new Date(),
         user: robotUser,
       };
-      setMessages(previousMessages =>
-        GiftedChat.append(previousMessages, [apiMessage]),
-      );
+      updateMessages([responseMessage]);
     } catch (error) {
       console.error('Error fetching Gemini response:', error);
       const errorMessage = {
@@ -101,24 +225,45 @@ const Gemini = () => {
         createdAt: new Date(),
         user: robotUser,
       };
-      setMessages(previousMessages =>
-        GiftedChat.append(previousMessages, [errorMessage]),
-      );
+      updateMessages([errorMessage]);
     } finally {
       setLoading(false);
     }
   };
 
+  const speakMessage = (message: UIMessage) => {
+    if (speakingIdRef.current === message._id) {
+      return;
+    }
+    if (ttsStatus === TtsStatus.started) {
+      Tts.stop();
+    } else {
+      Tts.speak(message.text);
+      speakingIdRef.current = message._id;
+    }
+  };
+
   const renderBubble = (props: any) => {
+    const backgroundColorLeft =
+      ttsStatus === TtsStatus.started &&
+      speakingIdRef.current === props.currentMessage._id
+        ? robot.primary + '4D'
+        : appStyles.color.lightGrey;
+    console.log('message', props.currentMessage);
     return (
       <Bubble
         {...props}
+        position={props.currentMessage.user._id === robot.id ? 'left' : 'right'}
+        onLongPress={() => {}}
+        onPress={() => {
+          speakMessage(props.currentMessage);
+        }}
         wrapperStyle={{
           right: {
-            backgroundColor: robot.primary,
+            backgroundColor: robot.primary + 'CC',
           },
           left: {
-            backgroundColor: appStyles.color.lightGrey,
+            backgroundColor: backgroundColorLeft,
           },
         }}
         textStyle={{
@@ -135,11 +280,10 @@ const Gemini = () => {
 
   const renderSend = (props: any) => {
     return (
-      <Send {...props}>
-        <View style={styles.sendButton}>
-          <Icon name="send-plane-fill" size="24" color={robot.primary}></Icon>
-        </View>
-      </Send>
+      <SendButton
+        {...props}
+        color={robot.primary}
+        disabled={loading}></SendButton>
     );
   };
 
@@ -149,11 +293,28 @@ const Gemini = () => {
         {...props}
         containerStyle={{
           backgroundColor: appStyles.color.background,
-          borderTopColor: appStyles.color.lightGrey,
-          borderTopWidth: 1,
         }}
         textInputStyle={{
           color: appStyles.color.primary,
+          backgroundColor: 'white',
+          paddingHorizontal: 10,
+          borderRadius: 4,
+        }}
+        renderActions={() => {
+          return (
+            <ToolbarActions
+              color={robot.primary}
+              onPickImage={({uri, fileSize, base64, type}) => {
+                console.log('onPick', uri, fileSize);
+                if (uri) {
+                  sendImage(uri, base64, type);
+                }
+              }}
+              onRecognize={text => {
+                sendMessage(text);
+                console.log('recognizeCallback', text);
+              }}></ToolbarActions>
+          );
         }}
       />
     );
@@ -165,20 +326,24 @@ const Gemini = () => {
         messages={messages}
         isTyping={loading}
         onSend={onSend}
-        user={{_id: 1}}
         renderBubble={renderBubble}
         renderSend={renderSend}
         renderInputToolbar={renderInputToolbar}
         renderAvatar={renderAvatar}
         showAvatarForEveryMessage={true}
+        showUserAvatar={true}
+        user={currentUserRef.current}
         alwaysShowSend
-        scrollToBottom
-        placeholder="Type your message here..."
+        placeholder="Type your message..."
         timeTextStyle={{
           right: {color: appStyles.color.background},
           left: {color: appStyles.color.secondary},
         }}
+        shouldUpdateMessage={(props, nextProps) => {
+          return true;
+        }}
       />
+      <DismissButton />
     </SafeAreaView>
   );
 };
@@ -197,8 +362,12 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: appStyles.color.lightGrey,
   },
-  sendButton: {
-    marginRight: 10,
-    marginBottom: 5,
+  toolBar: {
+    backgroundColor: appStyles.color.background,
+    borderTopColor: appStyles.color.lightGrey,
+    borderTopWidth: 1,
+    paddingLeft: 5,
+    paddingRight: 10,
+    paddingBottom: 10,
   },
 });
