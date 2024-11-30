@@ -2,6 +2,8 @@ This is a [**React Native**](https://reactnative.dev) project, primarily focused
 
 <img src="Screenshot.jpeg" width="300" />
 
+### See more details on [**Google Drive**](https://drive.google.com/file/d/1zqfQnXIRaHCQhDe3C1GDrOORWemDDsrx/view?usp=sharing).
+
 # React Native Project Setup
 
 This guide will walk you through the setup process for an existing React Native project. It assumes you've already cloned the project and have the necessary tools installed. If not, follow the [React Native Environment Setup](https://reactnative.dev/docs/environment-setup) instructions to get started.
