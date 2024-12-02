@@ -6,12 +6,7 @@ import React, {
   useRef,
 } from 'react';
 import {StyleSheet, SafeAreaView, Image} from 'react-native';
-import {
-  GiftedChat,
-  Bubble,
-  InputToolbar,
-  Composer,
-} from 'react-native-gifted-chat';
+import {GiftedChat, Bubble, InputToolbar} from 'react-native-gifted-chat';
 import {
   useRoute,
   useNavigation,
@@ -26,13 +21,13 @@ import {RootStackParams} from '@/navigation/types/RootStackParams';
 import {AIMessageType, UIMessage} from '@/http/type';
 import SendButton from '@/views/common/SendButton';
 import {useShallow} from 'zustand/react/shallow';
-import Tts from 'react-native-tts';
-import useTtsStore, {TtsStatus} from '@/views/common/useTtsStore';
 import ToolbarActions from '@/views/common/ToolbarActions';
 import {requestOpenai} from '@/http/OpenaiAPI';
 import {Keyboard} from 'react-native';
 import DismissButton from '@/views/common/DismissButton';
 import SettingsButton from '@/navigation/SettingsButton';
+import {requestOpenaiTTS} from '@/http/OpenaiAPI';
+import TrackPlayer, {State, usePlaybackState} from 'react-native-track-player';
 
 interface Props {
   robot: Robot;
@@ -91,51 +86,10 @@ const OpenAI = () => {
     currentUserRef.current = fetchUserData();
   }, []);
 
-  const {ttsStatus, setTtsStatus} = useTtsStore(
-    useShallow(state => ({
-      ttsStatus: state.ttsStatus,
-      setTtsStatus: state.setTtsStatus,
-    })),
-  );
+  const playbackState = usePlaybackState();
+  const [loadingTTS, setLoadingTTS] = useState(false);
 
   const speakingIdRef = React.useRef<string | number | null>(null);
-
-  const onStart = () => {
-    setTtsStatus(TtsStatus.started);
-  };
-
-  const onFinish = () => {
-    console.log('onFinish');
-    setTtsStatus(TtsStatus.finished);
-    speakingIdRef.current = null;
-  };
-  const onCancel = () => {
-    console.log('onCancel');
-    setTtsStatus(TtsStatus.cancelled);
-    speakingIdRef.current = null;
-  };
-  useEffect(() => {
-    Tts.setIgnoreSilentSwitch('ignore');
-    Tts.getInitStatus().then(result => {});
-    return () => {
-      Tts.stop();
-    };
-  }, []);
-
-  useEffect(() => {
-    Tts.setIgnoreSilentSwitch('ignore');
-    Tts.getInitStatus().then(result => {
-      Tts.addEventListener('tts-start', onStart);
-      Tts.addEventListener('tts-finish', onFinish);
-      Tts.addEventListener('tts-cancel', onCancel);
-    });
-    return () => {
-      Tts.stop();
-      Tts.removeEventListener('tts-start', onStart);
-      Tts.removeEventListener('tts-finish', onFinish);
-      Tts.removeEventListener('tts-cancel', onCancel);
-    };
-  }, []);
 
   const updateMessages = (messages: UIMessage[]) => {
     setMessages(previousMessages => {
@@ -237,22 +191,63 @@ const OpenAI = () => {
     }
   };
 
-  const speakMessage = (message: UIMessage) => {
-    if (speakingIdRef.current === message._id) {
-      return;
-    }
-    if (ttsStatus === TtsStatus.started) {
-      Tts.stop();
-    } else {
-      Tts.speak(message.text);
-      speakingIdRef.current = message._id;
+  const setupPlayer = async () => {
+    try {
+      await TrackPlayer.setupPlayer();
+    } catch (error: any) {
+      if (error && typeof error.code === 'string') {
+        if (error.code !== 'player_already_initialized') {
+          console.log(error.code);
+        }
+      } else {
+        console.log(JSON.stringify(error));
+      }
     }
   };
 
+  const disposePlayer = async () => {
+    await TrackPlayer.stop();
+    await TrackPlayer.reset();
+  };
+
+  useEffect(() => {
+    setupPlayer();
+    return () => {
+      disposePlayer();
+    };
+  }, []);
+
+  const speakMessage = async (message: UIMessage) => {
+    if (speakingIdRef.current === message._id) {
+      return;
+    }
+    setLoadingTTS(true);
+    speakingIdRef.current = message._id;
+    const {data} = await requestOpenaiTTS({text: message.text});
+    const track = {
+      id: message._id,
+      url: `file://${data.audioPath}`,
+    };
+    try {
+      await TrackPlayer.stop();
+      await TrackPlayer.reset();
+      await TrackPlayer.add([track]);
+      await TrackPlayer.play();
+    } catch (error) {
+      console.log(JSON.stringify(error));
+    }
+  };
+
+  useEffect(() => {
+    console.log('playbackState', playbackState);
+    if (!playbackState || playbackState.state === State.Ended) {
+      setLoadingTTS(false);
+    }
+  }, [playbackState]);
+
   const renderBubble = (props: any) => {
     const backgroundColorLeft =
-      ttsStatus === TtsStatus.started &&
-      speakingIdRef.current === props.currentMessage._id
+      loadingTTS === true && speakingIdRef.current === props.currentMessage._id
         ? robot.primary + '4D'
         : appStyles.color.lightGrey;
     console.log('message', props.currentMessage);

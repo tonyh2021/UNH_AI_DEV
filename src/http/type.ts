@@ -33,3 +33,14 @@ export interface AIMessageType {
 export interface AIMessageResponseType {
   data: AIMessageType;
 }
+
+export interface OpenaiTTSRequestParams {
+  text: string;
+}
+
+export interface OpenaiTTSResponse {
+  data: {
+    audioPath: string;
+    text: string;
+  };
+}

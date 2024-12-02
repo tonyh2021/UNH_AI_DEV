@@ -1,19 +1,18 @@
 import {create} from 'zustand';
 
 export enum TtsStatus {
-  initiliazing = 'initiliazing',
-  started = 'started',
-  finished = 'finished',
-  cancelled = 'cancelled',
+  loading = 'loading',
+  playing = 'playing',
+  stopped = 'stopped',
 }
 
 interface TtsStore {
-  ttsStatus: TtsStatus;
+  ttsStatus: TtsStatus | undefined;
   setTtsStatus: (status: TtsStatus) => void;
 }
 
 const useTtsStore = create<TtsStore>(set => ({
-  ttsStatus: TtsStatus.initiliazing,
+  ttsStatus: undefined,
   setTtsStatus: status => set({ttsStatus: status}),
 }));
 
